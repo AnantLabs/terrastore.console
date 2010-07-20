@@ -11,7 +11,8 @@
             predicateType:"js",
             limit:100,
             comparator:"lexical-asc",
-            timeToLive:10000
+            timeToLive:10000,
+            checkJSON: false
         },
 
         /**
@@ -36,12 +37,14 @@
          */
         putValue: function(bucket, key, value, predicateExpression, options) {
             $.terrastoreClient.checkNotNull(bucket, key, value);
+            var currentOptions = $.extend(true, {}, $.terrastoreClient.options, options);
             if (typeof value == "object") {
                 value = JSON.stringify(value);
             } else if (typeof value !== "string") {
                 $.error("The type of 'value' must be a json string or object");
+            } else if (currentOptions.checkJSON) {
+                eval('(' + value + ')');
             }
-            var currentOptions = $.extend(true, {}, $.terrastoreClient.options, options);
             var currentURL = currentOptions.baseURL + "/" + bucket + "/" + key;
             if (predicateExpression) currentURL = currentURL + "?predicate=" + currentOptions.predicateType + ":" + encodeURIComponent(predicateExpression);
             $.ajax({
