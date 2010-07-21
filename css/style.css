@@ -101,7 +101,7 @@ h1 {
 	background: url(../images/menuBackgroundActive.gif) repeat-x left top;
 	color: #fff;
 }
-#navcontainer ul li #current {
+.current {
 	background: url(../images/menuBackgroundActive.gif) repeat-x left top;
 	color: #fff;
 }
@@ -126,3 +126,39 @@ h1 {
 .n_tl {background:url(../images/n_tl.gif) 0 0 no-repeat}
 .n_tr {background:url(../images/n_tr.gif) 100% 0 no-repeat; padding:1px 20px} 
 /* end news border corners*/
+
+
+
+#hor-minimalist-a {
+    /*background: none repeat scroll 0 0 #FFFFFF;*/
+    border-collapse: collapse;
+    font-size: 12px;
+    margin: 20px;
+    text-align: left;
+    width: 480px;
+}
+
+#hor-minimalist-a th {
+    border-bottom: 2px solid #84BE19;
+    color: #84BE19;
+    font-size: 14px;
+    font-weight: normal;
+    padding: 10px 8px;
+}
+
+#hor-minimalist-a td {
+    color: #666699;
+    padding: 9px 8px 0;
+}
+
+#hor-minimalist-a tbody tr:hover td {
+    color: #000099;
+}
+
+#paginator-element{
+    margin-left: 50px;
+}
+
+#progressbar{
+    width: 5em;
+}

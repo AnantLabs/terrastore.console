@@ -12,7 +12,12 @@
             limit:100,
             comparator:"lexical-asc",
             timeToLive:10000,
-            checkJSON: false
+            checkJSON: false,
+            successCallback: function(data, textStatus, XMLHttpReques) {
+            },
+            errorCallback: function(XMLHttpRequest, textStatus, errorThrown) {
+                console.log('error while executing a terrastore request:' + XMLHttpRequest + ' and status:' + textStatus + 'and errorThrown:' + errorThrown);
+            }
         },
 
         /**
@@ -53,8 +58,8 @@
                 contentType:"application/json",
                 type: 'PUT',
                 processData: false,
-                success: function(result) {
-                }
+                success: currentOptions.successCallback,
+                error: currentOptions.errorCallback
             });
         },
 
@@ -67,18 +72,17 @@
          * @param predicate The predicate to evaluate; predicate can be null or empty.
          * @return The value.
          */
-        getValue: function(bucket, key, predicateExpression, options) {
+        getValue: function(bucket, key, successCallback, predicateExpression, options) {
             $.terrastoreClient.checkNotNull(bucket, key);
-            var currentOptions = $.extend(true, {}, $.terrastoreClient.options, options);
+            var currentOptions = $.extend(true, {}, $.terrastoreClient.options, {successCallback:successCallback}, options);
             var currentURL = currentOptions.baseURL + "/" + bucket + "/" + key;
             if (predicateExpression) currentURL = currentURL + "?predicate=" + currentOptions.predicateType + ":" + encodeURIComponent(predicateExpression);
-            return $.ajax({
+            $.ajax({
                 url: currentURL,
                 dataType:"json",
                 type: 'GET',
-                success: function(result) {
-                    return result;
-                }
+                success: currentOptions.successCallback,
+                error: currentOptions.errorCallback
             });
         },
 
@@ -94,8 +98,8 @@
             $.ajax({
                 url: currentOptions.baseURL + "/" + bucket + "/" + key,
                 type: 'DELETE',
-                success: function(result) {
-                }
+                success: currentOptions.successCallback,
+                error: currentOptions.errorCallback
             });
         },
 
@@ -104,15 +108,14 @@
          *
          * @return A collection of all bucket names.
          */
-        getBuckets:function(options) {
-            var currentOptions = $.extend(true, {}, $.terrastoreClient.options, options);
-            return $.ajax({
-                url: currentOptions.baseURL + "/buckets",
+        getBuckets:function(successCallback, options) {
+            var currentOptions = $.extend(true, {}, $.terrastoreClient.options, {successCallback:successCallback}, options);
+            $.ajax({
+                url: currentOptions.baseURL,
                 dataType:"json",
                 type: 'GET',
-                success: function(result) {
-                    return result;
-                }
+                success: currentOptions.successCallback,
+                error: currentOptions.errorCallback
             });
         },
 
@@ -127,8 +130,8 @@
             $.ajax({
                 url: currentOptions.baseURL + "/" + bucket,
                 type: 'DELETE',
-                success: function(result) {
-                }
+                success: currentOptions.successCallback,
+                error: currentOptions.errorCallback
             });
 
         },
@@ -143,21 +146,20 @@
          * @param parameters The update operation parameters.
          * @return The updated value
          */
-        updateValue:function(bucket, key, updateFunction, timeoutInMillis, parameters, options) {
+        updateValue:function(bucket, key, successCallback, updateFunction, timeoutInMillis, parameters, options) {
             $.terrastoreClient.checkNotNull(bucket, key, updateFunction);
             var param = {"updateFunction" : "" + updateFunction.toString(-1).replace(/[\n\r\t]/g, "") };
             $.extend(param, parameters);
-            var currentOptions = $.extend(true, {}, $.terrastoreClient.options, {timeoutInMillis: timeoutInMillis}, options);
-            return $.ajax({
+            var currentOptions = $.extend(true, {}, $.terrastoreClient.options, {timeoutInMillis: timeoutInMillis}, {successCallback:successCallback}, options);
+            $.ajax({
                 url: currentOptions.baseURL + "/" + bucket + "/" + key + "/" + "update?function=js&timeout=" + currentOptions.timeoutInMillis,
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify(param),
                 dataType:"json",
                 processData: false,
-                success: function(result) {
-                    return result;
-                }
+                success: currentOptions.successCallback,
+                error: currentOptions.errorCallback
             });
         },
 
@@ -168,16 +170,15 @@
          * @param limit Max number of elements to retrieve; if zero, all values will be returned.
          * @return A map containing all key/value entries.
          */
-        getAllValues:function(bucket, options) {
+        getAllValues:function(bucket, successCallback, options) {
             $.terrastoreClient.checkNotNull(bucket);
-            var currentOptions = $.extend(true, {}, $.terrastoreClient.options, options);
-            return $.ajax({
+            var currentOptions = $.extend(true, {}, $.terrastoreClient.options, {successCallback:successCallback}, options);
+            $.ajax({
                 url: currentOptions.baseURL + "/" + bucket + "?limit=" + currentOptions.limit,
                 dataType:"json",
                 type: 'GET',
-                success: function(result) {
-                    return result;
-                }
+                success: currentOptions.successCallback,
+                error: currentOptions.errorCallback
             });
         },
 
@@ -202,18 +203,17 @@
          * and the query executed on the fresh snasphot.
          * @return A map containing key/value pairs
          */
-        queryByRange:function(bucket, startKey, endKey, predicateExpression, options) {
+        queryByRange:function(bucket, startKey, endKey, successCallback, predicateExpression, options) {
             $.terrastoreClient.checkNotNull(bucket, startKey, endKey);
-            var currentOptions = $.extend(true, {}, $.terrastoreClient.options, options);
+            var currentOptions = $.extend(true, {}, $.terrastoreClient.options, {successCallback:successCallback}, options);
             var currentURL = currentOptions.baseURL + "/" + bucket + "/range?comparator=" + currentOptions.comparator + "&startKey=" + startKey + "&endKey=" + endKey + "&timeToLive=" + currentOptions.timeToLive;
             if (predicateExpression) currentURL = currentURL + "&predicate=" + currentOptions.predicateType + ":" + encodeURIComponent(predicateExpression);
-            return $.ajax({
+            $.ajax({
                 url: currentURL,
                 dataType:"json",
                 type: 'GET',
-                success: function(result) {
-                    return result;
-                }
+                success: currentOptions.successCallback,
+                error: currentOptions.errorCallback
             });
         },
 
@@ -224,16 +224,15 @@
          * @param predicate The predicate to evaluate.
          * @return A map containing key/value pairs
          */
-        queryByPredicate:function(bucket, predicate, options) {
+        queryByPredicate:function(bucket, predicate, successCallback, options) {
             $.terrastoreClient.checkNotNull(bucket, predicate);
-            var currentOptions = $.extend(true, {}, $.terrastoreClient.options, options);
-            return $.ajax({
+            var currentOptions = $.extend(true, {}, $.terrastoreClient.options, {successCallback:successCallback}, options);
+            $.ajax({
                 url: currentOptions.baseURL + "/" + bucket + "/predicate?predicate=" + currentOptions.predicateType + ":" + encodeURIComponent(predicate),
                 dataType:"json",
                 type: 'GET',
-                success: function(result) {
-                    return result;
-                }
+                success: currentOptions.successCallback,
+                error: currentOptions.errorCallback
             });
         },
 
@@ -248,13 +247,12 @@
         importBackup:function(bucket, source, options) {
             $.terrastoreClient.checkNotNull(bucket, source);
             var currentOptions = $.extend(true, {}, $.terrastoreClient.options, options);
-            return $.ajax({
+            $.ajax({
                 url: currentOptions.baseURL + "/" + bucket + "/import?source=" + source + "&secret=" + currentOptions.secret,
                 dataType:"json",
                 type: 'GET',
-                success: function(result) {
-                    return result;
-                }
+                success: currentOptions.successCallback,
+                error: currentOptions.errorCallback
             });
         }
         ,
@@ -268,13 +266,12 @@
         exportBackup:function(bucket, destination, options) {
             $.terrastoreClient.checkNotNull(bucket, destination);
             var currentOptions = $.extend(true, {}, $.terrastoreClient.options, options);
-            return $.ajax({
+            $.ajax({
                 url: currentOptions.baseURL + "/" + bucket + "/export?destination=" + destination + "&secret=" + currentOptions.secret,
                 dataType:"json",
                 type: 'GET',
-                success: function(result) {
-                    return result;
-                }
+                success: currentOptions.successCallback,
+                error: currentOptions.errorCallback
             });
         }
     }
