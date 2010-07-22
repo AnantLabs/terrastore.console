@@ -4,6 +4,7 @@ $(function() {
         $("#navlist a").removeClass();
         $(this).addClass("current");
     });
+
     $.ajaxSetup({
         error:function(x, e) {
             if (x.status == 0) {
@@ -49,21 +50,43 @@ $(function() {
             $("#content").processTemplate(null);
         });
 
-        this.get('#/buckets', function() {
+        this.get('#/buckets', function(context) {
             $.terrastoreClient.getBuckets(function(buckets) {
                 $("#content").setTemplateElement("buckets");
-                $("#content").setParam('path', "#/view/bucket/");
+                $("#content").setParam('viewPath', "#/view/bucket/");
+                $("#content").setParam('removePath', "#/remove/");
                 $("#content").processTemplate(buckets);
-                $('#content a').button({
-                    icons: {
-                        secondary: 'ui-icon-transferthick-e-w'
-                    }
+                $('#content input:submit').button();
+                $("#content a[class=removeOp]").click(function() {
+                    var href = $(this).attr("href");
+                    $("#remove-confirm").dialog({
+                        resizable: false,
+                        width:'auto',
+                        modal: true,
+                        buttons: {
+                            'Delete this item': function() {
+                                $(this).dialog('close');
+                                context.redirect(href);
+                            },
+                            Cancel: function() {
+                                $(this).dialog('close');
+                            }
+                        }
+                    });
+                    return false;
                 });
             });
 
         });
 
-        this.get('#/view/bucket/:bucketName', function() {
+        this.post('#/put/value', function(context) {
+            var bucketName = this.params['bucketName'];
+            $.terrastoreClient.putValue(bucketName, this.params['key'], this.params['value'], null, {successCallback: function() {
+                context.redirect('#/view/bucket/' + bucketName);
+            }});
+        });
+
+        this.get('#/view/bucket/:bucketName', function(context) {
             var bucketName = this.params['bucketName'];
             $.terrastoreClient.getAllValues(bucketName, function(values) {
                 var data = [];
@@ -74,7 +97,45 @@ $(function() {
                 $("#content").setParam('path', "#/remove/");
                 $("#content").setParam('bucketName', bucketName);
                 $("#content").processTemplate(data);
+                $('#content input:submit').button();
+                $('#content td[class=value]').editable(function(value, settings) {
+                    var bucketName = $("#bucketName").html();
+                    var key = $("table td[class=key]").html();
+                    $.terrastoreClient.putValue(bucketName, key, value);
+                    return (value);
+                }, {
+                    type      : 'textarea',
+                    cancel    : 'Cancel',
+                    submit    : 'Update',
+                    style     : 'display: inline',
+                    tooltip   : 'Click to edit...'
+                });
+                $("#content a[class=removeOp]").click(function() {
+                    var href = $(this).attr("href");
+                    $("#remove-confirm").dialog({
+                        resizable: false,
+                        width:'auto',
+                        modal: true,
+                        buttons: {
+                            'Delete this item': function() {
+                                $(this).dialog('close');
+                                context.redirect(href);
+                            },
+                            Cancel: function() {
+                                $(this).dialog('close');
+                            }
+                        }
+                    });
+                    return false;
+                });
             });
+        });
+
+        this.get('#/remove/:bucketName', function(context) {
+            var bucketName = this.params['bucketName'];
+            $.terrastoreClient.removeBucket(bucketName, {successCallback: function() {
+                context.redirect('#/buckets');
+            }});
         });
 
         this.get('#/remove/:bucketName/:key', function(context) {
@@ -84,69 +145,123 @@ $(function() {
             }});
         });
 
+        this.get('#/search/value', function() {
+            $("#content").setTemplateElement("searchValue");
+            $("#content").processTemplate(null);
+            $('#content input:submit').button();
+        });
+
+        this.post('#/search/value', function(context) {
+            var key = this.params['key'];
+            var bucketName = this.params['bucketName'];
+            $.terrastoreClient.getValue(bucketName, key, function(value) {
+                $("#content").setTemplateElement("value");
+                $("#content").setParam('path', "#/remove/");
+                $("#content").setParam('bucketName', bucketName);
+                $("#content").processTemplate({"key":key, value:JSON.stringify(value)});
+                $('#content td[class=value]').editable(function(value, settings) {
+                    var bucketName = $("#bucketName").html();
+                    var key = $("table td[class=key]").html();
+                    $.terrastoreClient.putValue(bucketName, key, value);
+                    return (value);
+                }, {
+                    type      : 'textarea',
+                    cancel    : 'Cancel',
+                    submit    : 'Update',
+                    style     : 'display: inline',
+                    tooltip   : 'Click to edit...'
+                });
+                $("#content a[class=removeOp]").click(function() {
+                    var href = $(this).attr("href");
+                    $("#remove-confirm").dialog({
+                        resizable: false,
+                        width:'auto',
+                        modal: true,
+                        buttons: {
+                            'Delete this item': function() {
+                                $(this).dialog('close');
+                                context.redirect(href);
+                            },
+                            Cancel: function() {
+                                $(this).dialog('close');
+                            }
+                        }
+                    });
+                    return false;
+                });
+            });
+
+        });
+
+        this.post('#/search/range', function(context) {
+            var key = this.params['key'];
+            var bucketName = this.params['bucketName'];
+            var from = this.params['from'];
+            var to = this.params['to'];
+            $.terrastoreClient.queryByRange(bucketName, from, to, function(values) {
+                var data = [];
+                for (var propertyName in values) {
+                    data.push({key:propertyName, value:JSON.stringify(values[propertyName])});
+                }
+                $("#content").setTemplateElement("values");
+                $("#content").setParam('path', "#/remove/");
+                $("#content").setParam('bucketName', bucketName);
+                $("#content").processTemplate(data);
+                $('#content input:submit').button();
+                $('#content td[class=value]').editable(function(value, settings) {
+                    var bucketName = $("#bucketName").html();
+                    var key = $("table td[class=key]").html();
+                    $.terrastoreClient.putValue(bucketName, key, value);
+                    return (value);
+                }, {
+                    type      : 'textarea',
+                    cancel    : 'Cancel',
+                    submit    : 'Update',
+                    style     : 'display: inline',
+                    tooltip   : 'Click to edit...'
+                });
+            });
+
+        });
+
+        this.get('#/exportImport', function() {
+            $("#content").setTemplateElement("exportImport");
+            $("#content").processTemplate(null);
+            var buttons = $('#content input:submit');
+            buttons.first().button();
+            buttons.last().button();
+        });
+
+        this.get('#/export', function(context) {
+            var bucketName = this.params['bucketName'];
+            var destination = this.params['destination'];
+            $.terrastoreClient.exportBackup(bucketName, destination, {successCallback:function() {
+                context.redirect("#/success");
+            }});
+        });
+
+        this.get('#/import', function(context) {
+            var bucketName = this.params['bucketName'];
+            var source = this.params['source'];
+            $.terrastoreClient.importBackup(bucketName, source, {successCallback:function() {
+                context.redirect("#/success");
+            }});
+        });
+
+        this.get('#/success', function() {
+            $("#content").setTemplateElement("success");
+            $("#content").processTemplate(null);
+            $(".ui-widget").effect("pulsate");
+        });
+
         this.get('#/about', function() {
             $("#content").setTemplateElement("about");
             $("#content").processTemplate(null);
         });
 
-        this.post('#/put/value/at/bucket/:bucketName', function(context) {
-            var bucketName = this.params['bucketName'];
-            $.terrastoreClient.putValue(bucketName, this.params['key'], this.params['value'], null, {successCallback: function() {
-                context.redirect('#/view/bucket/' + bucketName);
-            }});
-        });
-
-        this.get('#/send/:action', function() {
-            var url = 'services/send/' + this.params['action'];
-            url += '?numberOfAccounts=' + $('#numberOfAccounts').val();
-            if (this.params['action'] == 'MRC') {
-                url += '&fromDate=' + $('#fromDate').val();
-            }
-            $.get(url, function(data) {
-                alert('supply sent!');
-            });
-        });
-
-        this.get('#/supplies/:page', function(context) {
-            var maxForPage = 2;
-            var pages = 1;
-            var page = this.params['page'];
-            $.get('services/howmanysupplypages?maxForPage=' + maxForPage, function(data) {
-                pages = data;
-            });
-            $.get('services/supplies/' + page + '?maxForPage=' + maxForPage, function(data) {
-                $("#content").setTemplateURL("template/suppliesTable.html");
-                $("#content").setParam('path', "#/errorView/");
-                $("#content").processTemplate(data);
-                $("#pagination").paginate({
-                    count                   : pages,
-                    start                   : page,
-                    display                 : 10,
-                    border                  : false,
-                    text_color              : '#003399',
-                    background_color        : 'none',
-                    text_hover_color        : '#2573AF',
-                    background_hover_color  : 'none',
-                    mouse                   : 'press',
-                    onChange                : function(page) {
-                        context.redirect('#/supplies/' + page);
-                        return false;
-                    }
-
-                });
-            });
-        });
-
-        this.get('#/errorView/:id', function() {
-            $.get('services/supply/error/' + this.params['id'], function(data) {
-                $("#content").setTemplateURL("template/supplyError.html");
-                $("#content").processTemplate(data);
-            });
-        });
-
     });
 
     $(function() {
-        app.run('#/home')
+        app.run('#/home');
     });
 })(jQuery);

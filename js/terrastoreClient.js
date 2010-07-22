@@ -250,7 +250,7 @@
             $.ajax({
                 url: currentOptions.baseURL + "/" + bucket + "/import?source=" + source + "&secret=" + currentOptions.secret,
                 dataType:"json",
-                type: 'GET',
+                type: 'POST',
                 success: currentOptions.successCallback,
                 error: currentOptions.errorCallback
             });
@@ -269,7 +269,7 @@
             $.ajax({
                 url: currentOptions.baseURL + "/" + bucket + "/export?destination=" + destination + "&secret=" + currentOptions.secret,
                 dataType:"json",
-                type: 'GET',
+                type: 'POST',
                 success: currentOptions.successCallback,
                 error: currentOptions.errorCallback
             });

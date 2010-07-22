@@ -29,6 +29,7 @@
     <script src="js/sammy.min.js" type="text/javascript"></script>
     <script src="js/jstorage.min.js" type="text/javascript"></script>
     <script src="js/jpaginate.js" type="text/javascript"></script>
+    <script src="js/jeditable.min.js" type="text/javascript"></script>
     <script src="js/terrastoreClient.js" type="text/javascript"></script>
     <script src="js/controller.js" type="text/javascript"></script>
 </head>
@@ -44,6 +45,8 @@ Flash-Templates-Today.com - Gives a possibility to obtain a ready free flash tem
             <ul id="navlist">
                 <li><a href="#/home" class="current">Home</a></li>
                 <li><a href="#/buckets">Buckets</a></li>
+                <li><a href="#/search/value">Search</a></li>
+                <li><a href="#/exportImport">Export-Import</a></li>
                 <li><a href="#/about">About</a></li>
                 <li>
                     <div id="progressbar"></div>
@@ -54,92 +57,27 @@ Flash-Templates-Today.com - Gives a possibility to obtain a ready free flash tem
     <!-- end #header -->
     <!-- begin #sidebar1 -->
     <div id="sidebar1">
-        <div class="n_t">
-            <div class="n_b">
-                <div class="n_l">
-                    <div class="n_r">
-                        <div class="n_bl">
-                            <div class="n_br">
-                                <div class="n_tl">
-                                    <div class="n_tr">
-                                        <h1>NEWS</h1>
+        <div class="sidebarContent ui-corner-all">
+            <h1>Servers</h1>
 
-                                        <p>
-                                            <b>August 2, 2009</b><br/>
-                                            Duis tempor posuere diam. Suspendisse vel tellus quis nunc malesuada porta.<br/>
-                                            <a href="">see more...</a>
-                                        </p>
-
-                                        <p>
-                                            <b>August 1, 2009</b><br/>
-                                            Tempus Duis tempor posuere diam. Suspendisse quis nunc malesuada porta.<br/>
-                                            <a href="">see more...</a>
-                                        </p>
-
-                                        <p>
-                                            <b>July 28, 2009</b><br/>
-                                            Duis tempor posuere diam. Suspendisse vel tellus quis nunc malesuada porta.<br/>
-                                            <a href="">see more...</a>
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <p>
+                <b>August 2, 2009</b><br/>
+                Duis tempor posuere diam. Suspendisse vel tellus quis nunc malesuada porta.<br/>
+                <a href="">see more...</a>
+            </p>
         </div>
-        <br/>
+        <div class="sidebarContent ui-corner-all">
+            <h1>Messages</h1>
 
-        <div class="t">
-            <div class="b">
-                <div class="l">
-                    <div class="r">
-                        <div class="bl">
-                            <div class="br">
-                                <div class="tl">
-                                    <div class="tr">
-                                        <h1>MESSAGES</h1>
+            <p>
 
-                                        <p>
-                                            <b>August 2, 2009</b><br/>
-                                            I have just found the best flash templates. I\'ve been surfing the in the past but could find the ones like yours. They they are simple with magnificent interface and most of all free with the credit your way.<br/><br/>
-                                            This is incredible. I knew very little about website design and development. I\'m still learning through surfing and reading the webs tutorials on html and css and I\' still learning slowly. I hope I will have the time to learn more about developing Flash Websites from your site. I\'m quite new to all this so I\'m really enjoy learning about
-                                            it.<br/><br/>
-                                            By the way I\'m from Solomon islands in the South Pacific if you haven\'t seen it on the map. Its just a tiny dot. Anyway thanks a lot for your site. its been really helpful for me. I will certainly download one template when I\'m comfortable with web development.
-                                            Have great time<br/>
-                                            Author: <b>Rolland Gito</b><br/><br/>
-                                            <a href="http://flash-templates-today.com/testimonials.php">see all testimonials...</a>
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            </p>
         </div>
     </div>
     <!-- end #sidebar1 -->
     <!-- begin #mainContent -->
     <div id="mainContent">
-        <div class="t">
-            <div class="b">
-                <div class="l">
-                    <div class="r">
-                        <div class="bl">
-                            <div class="br">
-                                <div class="tl">
-                                    <div class="tr">
-                                        <div id="content">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div id="content">
         </div>
     </div>
     <!-- end #mainContent -->
@@ -157,12 +95,16 @@ Flash-Templates-Today.com - Gives a possibility to obtain a ready free flash tem
 </div>
 <!-- end #container -->
 
-<p style="display:none"><textarea id="home" rows="0" cols="0"><![CDATA[
+<p style="display:none"><textarea id="home" rows="0" cols="0"><!--
+<div class="content ui-corner-all">
     <p>Welcome to terrastore console.</p>
-    ]]></textarea>
+</div>
+    --></textarea>
 </p>
 
-<p style="display:none"><textarea id="buckets" rows="0" cols="0"><![CDATA[
+<p style="display:none"><textarea id="buckets" rows="0" cols="0"><!--
+<div class="content ui-corner-all">
+    <h1>Buckets</h1>
     <table id="hor-minimalist-a" class="pp">
         <thead>
         <tr>
@@ -173,18 +115,30 @@ Flash-Templates-Today.com - Gives a possibility to obtain a ready free flash tem
         {#foreach $T as row}
         <tr>
             <td class="bucket">{$T.row}</td>
-            <td class="operation"><a class="viewOp" href="{$P.path + $T.row}">View bucket</a></td>
+            <td class="operation"><a class="viewOp" href="{$P.viewPath + $T.row}">View</a>,
+                                  <a class="removeOp" href="{$P.removePath + $T.row}">Delete</a></td>
         </tr>
         {#/for}
     </table>
-    <div id="paginator-element">
-        <div id="pagination"></div>
-    </div>
-    ]]></textarea>
+</div>
+<div class="content ui-corner-all">
+    <h1>Insert value</h1>
+    <form action="#/put/value" method="post">
+        <p><label for="key">Bucket:</label><input type="text" name="bucketName"/></p>
+        <p><label for="key">Key:</label><input type="text" name="key"/></p>
+        <p><label for="value">Value:</label><textarea name="value" COLS=40 ROWS=6></textarea></p>
+        <p><input type="submit" value="Put" /></p>
+    </form>
+</div>
+<div id="remove-confirm" title="Do you want to remove it?" style="display:none">
+    <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>These item will be permanently deleted and cannot be recovered. Are you sure?</p>
+</div>
+    --></textarea>
 </p>
 
-<p style="display:none"><textarea id="values" rows="0" cols="0"><![CDATA[
-    <h1>{$P.bucketName}</h1>
+<p style="display:none"><textarea id="values" rows="0" cols="0"><!--
+<div class="content ui-corner-all">
+    <h1 id="bucketName">{$P.bucketName}</h1>
     <table id="hor-minimalist-a" class="pp">
         <thead>
         <tr>
@@ -195,27 +149,112 @@ Flash-Templates-Today.com - Gives a possibility to obtain a ready free flash tem
         </thead>
         {#foreach $T as row}
         <tr>
-            <td class="bucket">{$T.row.key}</td>
-            <td class="bucket">{$T.row.value}</td>
-            <td class="operation"><a class="viewOp" href="{$P.path + $P.bucketName + '/' + $T.row.key}">Delete value</a></td>
+            <td class="key">{$T.row.key}</td>
+            <td class="value">{$T.row.value}</td>
+            <td class="operation"><a class="removeOp" href="{$P.path + $P.bucketName + '/' + $T.row.key}">Delete</a></td>
         </tr>
         {#/for}
     </table>
-    <div id="paginator-element">
-        <div id="pagination"></div>
-    </div>
-    <br>
-    <form action="#/put/value/at/bucket/{$P.bucketName}" method="post">
-        <p><input type="submit" value="Put" /></p>
+</div>
+<div id="remove-confirm" title="Do you want to remove it?" style="display:none">
+    <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>These item will be permanently deleted and cannot be recovered. Are you sure?</p>
+</div>
+<div class="content ui-corner-all">
+    <h1>Insert value</h1>
+    <form action="#/put/value" method="post">
+        <input type="hidden" name="bucketName" value="{$P.bucketName}"/>
         <p><label for="key">Key:</label><input type="text" name="key"/></p>
         <p><label for="value">Value:</label><textarea name="value" COLS=40 ROWS=6></textarea></p>
+        <p><input type="submit" value="Put" /></p>
     </form>
-    ]]></textarea>
+</div>
+
+    --></textarea>
 </p>
 
-<p style="display:none"><textarea id="about" rows="0" cols="0"><![CDATA[
+<p style="display:none"><textarea id="searchValue" rows="0" cols="0"><!--
+<div class="content ui-corner-all">
+    <h1>Search by key</h1>
+    <form action="#/search/value" method="post">
+        <p><label for="bucket">Bucket:</label><input type="text" name="bucketName"/></p>
+        <p><label for="key">Key:</label><input type="text" name="key"/></p>
+        <p><input type="submit" value="Search" /></p>
+    </form>
+</div>
+
+<div class="content ui-corner-all">
+    <h1>Search by range</h1>
+    <form action="#/search/range" method="post">
+        <p><label for="bucket">Bucket:</label><input type="text" name="bucketName"/></p>
+        <p><label for="from">From:</label><input type="text" name="from"/></p>
+        <p><label for="to">To:</label><input type="text" name="to"/></p>
+        <p><input type="submit" value="Search" /></p>
+    </form>
+</div>
+    --></textarea>
+</p>
+
+<p style="display:none"><textarea id="value" rows="0" cols="0"><!--
+<div class="content ui-corner-all">
+    <h1 id="bucketName">{$P.bucketName}</h1>
+    <table id="hor-minimalist-a" class="pp">
+        <thead>
+        <tr>
+            <th>Key</th>
+            <th>Value</th>
+            <th>Operation</th>
+        </tr>
+        </thead>
+        <tr>
+            <td class="key">{$T.key}</td>
+            <td class="value">{$T.value}</td>
+            <td class="operation"><a class="removeOp" href="{$P.path + $P.bucketName + '/' + $T.key}">Delete</a></td>
+        </tr>
+    </table>
+</div>
+<div id="remove-confirm" title="Do you want to remove it?" style="display:none">
+    <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>These item will be permanently deleted and cannot be recovered. Are you sure?</p>
+</div>
+    --></textarea>
+</p>
+
+<p style="display:none"><textarea id="exportImport" rows="0" cols="0"><!--
+<div class="content ui-corner-all">
+    <h1>Export</h1>
+    <form action="#/export" method="get">
+        <p><label for="bucket">Bucket:</label><input type="text" name="bucketName"/></p>
+        <p><label for="destination">Destination:</label><input type="text" name="destination"/></p>
+        <p><input type="submit" value="Export" /></p>
+    </form>
+</div>
+<div class="content ui-corner-all">
+    <h1>Import</h1>
+    <form action="#/import" method="get">
+        <p><label for="bucket">Bucket:</label><input type="text" name="bucketName"/></p>
+        <p><label for="source">Source:</label><input type="text" name="source"/></p>
+        <p><input type="submit" value="Import" /></p>
+    </form>
+</div>
+    --></textarea>
+</p>
+
+<p style="display:none"><textarea id="success" rows="0" cols="0"><!--
+<div class="content ui-corner-all">
+    <div class="ui-widget">
+        <div class="ui-state-highlight ui-corner-all" style="padding: 0 .7em;">
+            <p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>
+            <strong>Operation completed.</strong></p>
+        </div>
+    </div>
+</div>
+    --></textarea>
+</p>
+
+<p style="display:none"><textarea id="about" rows="0" cols="0"><!--
+<div class="content ui-corner-all">
     <p>This is a simple javascript console to manage the data on terrastore.</p>
-    ]]></textarea>
+</div>
+    --></textarea>
 </p>
 
 </body>
