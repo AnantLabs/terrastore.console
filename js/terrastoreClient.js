@@ -14,9 +14,15 @@
             timeToLive:10000,
             checkJSON: false,
             successCallback: function(data, textStatus, XMLHttpReques) {
+                if ($.ajaxSettings && $.ajaxSettings.success) {
+                    $.ajaxSettings.success(data, textStatus, XMLHttpReques);
+                }
             },
             errorCallback: function(XMLHttpRequest, textStatus, errorThrown) {
                 console.log('error while executing a terrastore request:' + XMLHttpRequest + ' and status:' + textStatus + 'and errorThrown:' + errorThrown);
+                if ($.ajaxSettings && $.ajaxSettings.error) {
+                    $.ajaxSettings.error(XMLHttpRequest, textStatus, errorThrown);
+                }
             }
         },
 
@@ -81,7 +87,8 @@
                 url: currentURL,
                 dataType:"json",
                 type: 'GET',
-                success: currentOptions.successCallback,
+                success: currentOptions.successCallback
+                ,
                 error: currentOptions.errorCallback
             });
         },

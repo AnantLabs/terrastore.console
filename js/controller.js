@@ -41,13 +41,49 @@ $(function() {
         $("#progressbar").progressbar("destroy");
     });
 
+    var store = new Sammy.Store({name: 'consoleStore', type: 'local'});
+    if (store.keys().length < 1) {
+        $.sammy.log("consoleStore initialiazing");
+        store.set('1', 'http://localhost:8080');
+    }
+    $.terrastoreClient.setup({
+        baseURL : store.get('1')
+    });
+
 });
 
 (function($) {
     var app = $.sammy(function() {
+        this.use(Sammy.Storage);
+        this.store('consoleStore', {type: 'local'});
+
         this.get('#/home', function() {
+            var store = this.store('consoleStore');
+            var servers = [];
+            var keys = store.keys();
+            for (i = 0; i < keys.length; i++) {
+                servers.push({key:keys[i],value:store.get(keys[i])});
+            }
+            $("#serverSidebar").setTemplateElement("servers");
+            $("#serverSidebar").processTemplate(servers);
+            $('#serverSidebar p b').editable(function(value, settings) {
+                var key = $(this).parent().attr('id').replace("server-", "");
+                store.set(key, value);
+                $.terrastoreClient.setup({
+                    baseURL : store.get('1')
+                });
+                return (value);
+            }, {
+                type      : 'text',
+                cancel    : 'Cancel',
+                submit    : 'Update',
+                style     : 'display: inline',
+                tooltip   : 'Click to edit...'
+            });
+
             $("#content").setTemplateElement("home");
             $("#content").processTemplate(null);
+
         });
 
         this.get('#/buckets', function(context) {
