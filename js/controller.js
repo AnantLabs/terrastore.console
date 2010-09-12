@@ -301,7 +301,6 @@ $(function() {
     });
 
     $(function() {
-    	initDB.run();
         app.run('#/home');
     });
 })(jQuery);
