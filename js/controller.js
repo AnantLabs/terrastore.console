@@ -41,22 +41,27 @@ $(function() {
         $("#progressbar").progressbar("destroy");
     });
 
-    var store = new Sammy.Store({name: 'consoleStore', type: 'local'});
-    if (store.keys().length < 1) {
-        $.sammy.log("consoleStore initialiazing");
-        store.set('1', 'http://localhost:8080');
-    }
-    $.terrastoreClient.setup({
-        baseURL : store.get('1')
-    });
-
 });
 
 (function($) {
+	var initDB = $.sammy(function() {
+		this.use(Sammy.Storage);
+        var store;
+        if (Sammy.Store.isAvailable('local')) {
+        	store = this.store('consoleStore', {type: 'local'});
+        } else {
+        	store = this.store('consoleStore', {type: 'cookie'});
+        }
+        if (store.keys().length < 1) {
+            $.sammy.log("consoleStore initialiazing");
+            store.set('1', 'http://localhost:8080');
+        }
+        $.terrastoreClient.setup({
+            baseURL : store.get('1')
+        });	
+	});
+	
     var app = $.sammy(function() {
-        this.use(Sammy.Storage);
-        this.store('consoleStore', {type: 'local'});
-
         this.get('#/home', function() {
             var store = this.store('consoleStore');
             var servers = [];
@@ -296,6 +301,7 @@ $(function() {
     });
 
     $(function() {
+    	initDB.run();
         app.run('#/home');
     });
 })(jQuery);
