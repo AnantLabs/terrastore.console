@@ -31,6 +31,7 @@ h1 {
 	color:#FFFFFF;
 	text-align:right;
 	font-size:30px;
+	background: url("../images/logo.png") no-repeat scroll right top transparent
 }
 #serverSidebar {
 	float: right; /* since this element is floated, a width must be given */
