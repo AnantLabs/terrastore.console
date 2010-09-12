@@ -1,7 +1,7 @@
 @charset "utf-8";
 body  {
 	font-family:Arial, Helvetica, sans-serif;
-	font-size:12px;
+	font-size:10px;
 	background: #101415;
 	margin: 0; /* it's good practice to zero the margin and padding of the body element to account for differing browser defaults */
 	padding: 0;
@@ -18,7 +18,7 @@ h1 {
 #header {
 	background: #DDDDDD;
 	width: 900px;
-	height: 316px;
+	height: 270px;
 }
 #header .headerBackground {
 	width:900px;
@@ -43,7 +43,7 @@ h1 {
 	font-weight: bold;
 }
 #mainContent {
-	margin: 20px 280px 20px 40px; /* the right margin on this div element creates the column down the right side of the page - no matter how much content the sidebar1 div contains, the column space will remain. You can remove this margin if you want the #mainContent div's text to fill the #sidebar1 space when the content in #sidebar1 ends. */
+	margin: 50px 270px 20px 40px; /* the right margin on this div element creates the column down the right side of the page - no matter how much content the sidebar1 div contains, the column space will remain. You can remove this margin if you want the #mainContent div's text to fill the #sidebar1 space when the content in #sidebar1 ends. */
 }
 .productPic {
 	float:left;
@@ -94,7 +94,7 @@ h1 {
 	text-decoration: none;
 	float: left;
 	border-right: 1px solid #fff;
-	font-size:18px;
+	font-size:14px;
 	padding:11px 30px;
 }
 #navcontainer ul li a:hover {

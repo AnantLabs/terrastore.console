@@ -263,9 +263,7 @@ $(function() {
         this.get('#/exportImport', function() {
             $("#content").setTemplateElement("exportImport");
             $("#content").processTemplate(null);
-            var buttons = $('#content input:submit');
-            buttons.first().button();
-            buttons.last().button();
+            $('#content input:submit').button();
         });
 
         this.get('#/export', function(context) {
