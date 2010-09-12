@@ -86,13 +86,15 @@ Flash-Templates-Today.com - Gives a possibility to obtain a ready free flash tem
 
 <p style="display:none"><textarea id="servers" rows="0" cols="0"><!--
 <div class="sidebarContent ui-corner-all">
-    <h1>Servers</h1>
+    <h1>Setup</h1>
     {#foreach $T as row}
     <p id="server-{$T.row.key}">
-        Server {$T.row.key}:
+        Server:
         <b>{$T.row.value}</b><br/>
     </p>
     {#/for}
+    <hr>
+    <p>Click on server url to edit.</p>
 </div>
     --></textarea>
 </p>
@@ -247,7 +249,7 @@ Flash-Templates-Today.com - Gives a possibility to obtain a ready free flash tem
 
 <p style="display:none"><textarea id="about" rows="0" cols="0"><!--
 <div class="content ui-corner-all">
-    <p>Terrastore Javascript Console - Version 1.0.</p>
+    <p>Terrastore Javascript Console - Version 0.1.</p>
 </div>
     --></textarea>
 </p>
