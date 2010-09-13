@@ -48,6 +48,7 @@ Flash-Templates-Today.com - Gives a possibility to obtain a ready free flash tem
             <li><a href="#/buckets">Buckets</a></li>
             <li><a href="#/search/value">Search</a></li>
             <li><a href="#/exportImport">Export-Import</a></li>
+            <li><a href="#/stats">Statistics</a></li>
             <li><a href="#/about">About</a></li>
             <li>
                 <div id="progressbar"></div>
@@ -242,6 +243,40 @@ Flash-Templates-Today.com - Gives a possibility to obtain a ready free flash tem
             <p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>
             <strong>Operation completed.</strong></p>
         </div>
+    </div>
+</div>
+    --></textarea>
+</p>
+
+<p style="display:none"><textarea id="stats" rows="0" cols="0"><!--
+<div class="content ui-corner-all">
+    <div id="clusters">
+        <ul>
+            {#foreach $T.clusters as cluster}
+                <li><a href="#clusters-{$T.cluster$index}" class="clusters-{$T.cluster.status}">{$T.cluster.name}</a></li>
+            {#/for}
+        </ul>
+        {#foreach $T.clusters as cluster}
+            <div id="clusters-{$T.cluster$index}">
+                <h1>Nodes</h1>
+                <table id="hor-minimalist-a" class="pp">
+                    <thead>
+                    <tr>
+                        <th>Host</th>
+                        <th>Name</th>
+                        <th>Port</th>
+                    </tr>
+                    </thead>
+                    {#foreach $T.cluster.nodes as node}
+                    <tr>
+                        <td class="nodeHost">{$T.node.host}</td>
+                        <td class="nodeName">{$T.node.name}</td>
+                        <td class="nodePort">{$T.node.port}</td>
+                    </tr>
+                    {#/for}
+                </table>
+            </div>
+        {#/for}
     </div>
 </div>
     --></textarea>

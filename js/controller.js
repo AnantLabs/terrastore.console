@@ -303,6 +303,14 @@ $(function() {
             $(".ui-widget").effect("pulsate");
         });
 
+        this.get('#/stats', function() {
+            $.terrastoreClient.getValue("_stats", "cluster", function(value) {
+                $("#content").setTemplateElement("stats");
+                $("#content").processTemplate(value);
+                $("#clusters").tabs();
+            });
+        });
+
         this.get('#/about', function() {
             $("#content").setTemplateElement("about");
             $("#content").processTemplate(null);
