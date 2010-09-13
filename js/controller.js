@@ -47,15 +47,25 @@ $(function() {
 	var initDB = $.sammy(function() {
 		this.use(Sammy.Storage);
         var store;
-        if (Sammy.Store.isAvailable('local')) {
+        if (window.localStorage) {
+            $.sammy.log("consoleStore will use datastore of type local");
         	store = this.store('consoleStore', {type: 'local'});
+
         } else {
+            $.sammy.log("consoleStore will use datastore of type coockie");
         	store = this.store('consoleStore', {type: 'cookie'});
+
         }
+
         if (store.keys().length < 1) {
             $.sammy.log("consoleStore initialiazing");
             store.set('1', 'http://localhost:8080');
+
+        } else {
+            $.sammy.log("consoleStore already initialiazed");
+
         }
+
         $.terrastoreClient.setup({
             baseURL : store.get('1')
         });	
