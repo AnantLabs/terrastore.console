@@ -5,10 +5,21 @@ $(function() {
         $(this).addClass("current");
     });
 
+    var httpSuccessOriginal = jQuery.httpSuccess;
+    jQuery.httpSuccess = function( xhr ) {
+        if(xhr.status == 0) {
+            return false;
+    
+        } else {
+            httpSuccessOriginal.apply( this, arguments );
+        
+        }
+    }
+
     $.ajaxSetup({
         error:function(x, e) {
             if (x.status == 0) {
-                alert('You are offline!!\n Please Check Your Network.');
+                alert('You are offline!!\n Please Check Your Network and that CORS is enabled on terrastore.');
                 $.sammy.log(x.responseText)
 
             } else if (x.status == 404) {
@@ -28,8 +39,8 @@ $(function() {
                 $.sammy.log(x.responseText)
 
             } else {
-                alert('Unknow Error.\n');
-                $.sammy.log(x.responseText)
+                alert('Unknow Error.\n Please Check Your Network and that CORS is enabled on terrastore.');
+                $.sammy.log(x.responseText);
 
             }
         }
