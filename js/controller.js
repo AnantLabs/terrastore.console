@@ -1,88 +1,99 @@
-$(function() {
+/**
+ *Main application to set sammy to work.
+ *
+ */
+(function($) {
+    var app = $.sammy(function() {
+        this.use(Sammy.Storage);
+        this.bind('run', function() {
+            var context = this;
+            $("#navlist a").click(function() {
+                $("#navlist a").removeClass();
+                $(this).addClass("current");
+            });
 
-    $("#navlist a").click(function() {
-        $("#navlist a").removeClass();
-        $(this).addClass("current");
-    });
+            var httpSuccessOriginal = jQuery.httpSuccess;
+            jQuery.httpSuccess = function( xhr ) {
+                if(xhr.status == 0) {
+                    return false;
+            
+                } else {
+                    httpSuccessOriginal.apply( this, arguments );
+                
+                }
+            }
 
-    var httpSuccessOriginal = jQuery.httpSuccess;
-    jQuery.httpSuccess = function( xhr ) {
-        if(xhr.status == 0) {
-            return false;
-    
-        } else {
-            httpSuccessOriginal.apply( this, arguments );
-        
-        }
-    }
+            $.ajaxSetup({
+                error:function(x, e) {
+                    if (x.status == 0) {
+                        context.trigger('error',{message : 'You are offline!!<br> ' + 
+                                                           'Please Check Your Network and that CORS is enabled on your Terrastore server.' +
+                                                           'Check the <a href="http://code.google.com/p/terrastore/wiki/Operations#Setup_Cross_Origin_Resource_Sharing_support" TARGET="_blank">guide</a>.'});
+                        $.sammy.log(x.responseText)
 
-    $.ajaxSetup({
-        error:function(x, e) {
-            if (x.status == 0) {
-                alert('You are offline!!\n Please Check Your Network and that CORS is enabled on terrastore.');
-                $.sammy.log(x.responseText)
+                    } else if (x.status == 404) {
+                        context.trigger('error', {message: 'Requested URL not found.'});
+                        $.sammy.log(x.responseText)
 
-            } else if (x.status == 404) {
-                alert('Requested URL not found.');
-                $.sammy.log(x.responseText)
+                    } else if (x.status == 500) {
+                        context.trigger('error', {message: 'Internel Server Error.'});
+                        $.sammy.log(x.responseText)
 
-            } else if (x.status == 500) {
-                alert('Internel Server Error.');
-                $.sammy.log(x.responseText)
+                    } else if (e == 'parsererror') {
+                        context.trigger('error', {message: 'Error.\nParsing JSON Request failed.'});
+                        $.sammy.log(x.responseText)
 
-            } else if (e == 'parsererror') {
-                alert('Error.\nParsing JSON Request failed.');
-                $.sammy.log(x.responseText)
+                    } else if (e == 'timeout') {
+                        context.trigger('error', {message: 'Request Time out.'});
+                        $.sammy.log(x.responseText)
 
-            } else if (e == 'timeout') {
-                alert('Request Time out.');
-                $.sammy.log(x.responseText)
+                    } else {
+                        context.trigger('error',{message : 'Unknow Error.<br> ' + 
+                                                           'Please Check Your Network and that CORS is enabled on your Terrastore server.' +
+                                                           'Check the <a href="http://code.google.com/p/terrastore/wiki/Operations#Setup_Cross_Origin_Resource_Sharing_support" TARGET="_blank">guide</a>.'});
+                        $.sammy.log(x.responseText);
+
+                    }
+                }
+            });
+
+            $("#progressbar").bind("ajaxSend", function() {
+                $("#progressbar").progressbar({value: 100});
+            }).bind("ajaxComplete", function() {
+                $("#progressbar").progressbar("destroy");
+            });
+            
+            var store;
+            if (window.localStorage) {
+                $.sammy.log("consoleStore will use datastore of type local");
+            	store = this.store('consoleStore', {type: 'local'});
 
             } else {
-                alert('Unknow Error.\n Please Check Your Network and that CORS is enabled on terrastore.');
-                $.sammy.log(x.responseText);
+                $.sammy.log("consoleStore will use datastore of type coockie");
+            	store = this.store('consoleStore', {type: 'cookie'});
 
             }
-        }
-    });
 
-    $("#progressbar").bind("ajaxSend", function() {
-        $("#progressbar").progressbar({value: 100});
-    }).bind("ajaxComplete", function() {
-        $("#progressbar").progressbar("destroy");
-    });
+            if (store.keys().length < 1) {
+                $.sammy.log("consoleStore initialiazing");
+                store.set('1', 'http://localhost:8080');
 
-});
+            } else {
+                $.sammy.log("consoleStore already initialiazed");
 
-(function($) {
-	var initDB = $.sammy(function() {
-		this.use(Sammy.Storage);
-        var store;
-        if (window.localStorage) {
-            $.sammy.log("consoleStore will use datastore of type local");
-        	store = this.store('consoleStore', {type: 'local'});
+            }
 
-        } else {
-            $.sammy.log("consoleStore will use datastore of type coockie");
-        	store = this.store('consoleStore', {type: 'cookie'});
+            $.terrastoreClient.setup({
+                baseURL : store.get('1')
+            });
+            
+            $.terrastoreClient.getBuckets(function(buckets) {
+                if(!$.isArray(buckets)){
+                    context.trigger('error', {message: 'Please Check Your Network and that CORS is enabled on your Terrastore server.'});
+                }
+            });
+        });
 
-        }
-
-        if (store.keys().length < 1) {
-            $.sammy.log("consoleStore initialiazing");
-            store.set('1', 'http://localhost:8080');
-
-        } else {
-            $.sammy.log("consoleStore already initialiazed");
-
-        }
-
-        $.terrastoreClient.setup({
-            baseURL : store.get('1')
-        });	
-	});
-	
-    var app = $.sammy(function() {
         this.get('#/home', function() {
             var store = this.store('consoleStore');
             var servers = [];
@@ -311,6 +322,16 @@ $(function() {
         this.get('#/success', function() {
             $("#content").setTemplateElement("success");
             $("#content").processTemplate(null);
+            $(".ui-widget").effect("pulsate");
+        });
+        
+        this.get('#/error/:msg', function() {
+            context.trigger('error',this.params['msg']);    
+        });
+        
+        this.bind('error', function(e, data) {
+            $("#content").setTemplateElement("error", [], {filter_data : false});
+            $("#content").processTemplate(data.message);
             $(".ui-widget").effect("pulsate");
         });
 
