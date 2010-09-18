@@ -34,11 +34,11 @@ h1 {
 
 #header h1 {
     margin: 0; /* zeroing the margin of the last element in the #header div will avoid margin collapse - an unexplainable space between divs. If the div has a border around it, this is not necessary as that also avoids the margin collapse */
-    padding: 200px 40px 0 0; /* using padding instead of margin will allow you to keep the element away from the edges of the div */
-    color: #FFFFFF;
+    padding: 82px 16px 0 0; /* using padding instead of margin will allow you to keep the element away from the edges of the div */
+    color: #87888a;
     text-align: right;
     font-size: 30px;
-    background: url("../images/logo.png") no-repeat scroll right top transparent
+    background: url("../images/logo.png") no-repeat scroll 680px 0 transparent
 }
 
 #serverSidebar {
