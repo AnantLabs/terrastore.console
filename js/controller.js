@@ -18,7 +18,7 @@
                     return false;
             
                 } else {
-                    httpSuccessOriginal.apply( this, arguments );
+                    return httpSuccessOriginal.apply( this, arguments );
                 
                 }
             }
