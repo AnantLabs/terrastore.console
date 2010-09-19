@@ -54,7 +54,9 @@ h1 {
 }
 
 #mainContent {
-    margin: 50px 270px 20px 40px; /* the right margin on this div element creates the column down the right side of the page - no matter how much content the sidebar1 div contains, the column space will remain. You can remove this margin if you want the #mainContent div's text to fill the #sidebar1 space when the content in #sidebar1 ends. */
+	float:left;
+	width: 600px;
+    margin: 20px 20px 20px 20px; /* the right margin on this div element creates the column down the right side of the page - no matter how much content the sidebar1 div contains, the column space will remain. You can remove this margin if you want the #mainContent div's text to fill the #sidebar1 space when the content in #sidebar1 ends. */
 }
 
 .productPic {

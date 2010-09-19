@@ -1,10 +1,10 @@
 /**
  *Main application to set sammy to work.
- *
  */
 (function($) {
     var app = $.sammy(function() {
-        this.use(Sammy.Storage);
+    	var corsMsg = 'Please Check Your Network and that CORS is enabled on your Terrastore server. ' +
+        			  'Check the <a href="http://code.google.com/p/terrastore/wiki/Operations#Setup_Cross_Origin_Resource_Sharing_support" TARGET="_blank">guide</a>.'
         this.bind('run', function() {
             var context = this;
             $("#navlist a").click(function() {
@@ -12,23 +12,10 @@
                 $(this).addClass("current");
             });
 
-            var httpSuccessOriginal = jQuery.httpSuccess;
-            jQuery.httpSuccess = function( xhr ) {
-                if(xhr.status == 0) {
-                    return false;
-            
-                } else {
-                    return httpSuccessOriginal.apply( this, arguments );
-                
-                }
-            }
-
             $.ajaxSetup({
                 error:function(x, e) {
                     if (x.status == 0) {
-                        context.trigger('error',{message : 'You are offline!!<br> ' + 
-                                                           'Please Check Your Network and that CORS is enabled on your Terrastore server.' +
-                                                           'Check the <a href="http://code.google.com/p/terrastore/wiki/Operations#Setup_Cross_Origin_Resource_Sharing_support" TARGET="_blank">guide</a>.'});
+                        context.trigger('error',{message : 'You are offline!!<br> ' + corsMsg});
                         $.sammy.log(x.responseText)
 
                     } else if (x.status == 404) {
@@ -48,9 +35,7 @@
                         $.sammy.log(x.responseText)
 
                     } else {
-                        context.trigger('error',{message : 'Unknow Error.<br> ' + 
-                                                           'Please Check Your Network and that CORS is enabled on your Terrastore server.' +
-                                                           'Check the <a href="http://code.google.com/p/terrastore/wiki/Operations#Setup_Cross_Origin_Resource_Sharing_support" TARGET="_blank">guide</a>.'});
+                        context.trigger('error',{message : 'Unknow Error.<br> ' + corsMsg });
                         $.sammy.log(x.responseText);
 
                     }
@@ -63,20 +48,9 @@
                 $("#progressbar").progressbar("destroy");
             });
             
-            var store;
-            if (window.localStorage) {
-                $.sammy.log("consoleStore will use datastore of type local");
-            	store = this.store('consoleStore', {type: 'local'});
-
-            } else {
-                $.sammy.log("consoleStore will use datastore of type coockie");
-            	store = this.store('consoleStore', {type: 'cookie'});
-
-            }
-
-            if (store.keys().length < 1) {
+            if ($.jStorage.index().length < 1) {
                 $.sammy.log("consoleStore initialiazing");
-                store.set('1', 'http://localhost:8080');
+                $.jStorage.set('1', 'http://localhost:8080');
 
             } else {
                 $.sammy.log("consoleStore already initialiazed");
@@ -84,30 +58,31 @@
             }
 
             $.terrastoreClient.setup({
-                baseURL : store.get('1')
+                baseURL : $.jStorage.get('1')
             });
             
             $.terrastoreClient.getBuckets(function(buckets) {
                 if(!$.isArray(buckets)){
-                    context.trigger('error', {message: 'Please Check Your Network and that CORS is enabled on your Terrastore server.'});
+                	context.trigger('error',{message : corsMsg});
                 }
             });
         });
 
         this.get('#/home', function() {
-            var store = this.store('consoleStore');
             var servers = [];
-            var keys = store.keys();
+            var keys = $.jStorage.index();
             for (i = 0; i < keys.length; i++) {
-                servers.push({key:keys[i],value:store.get(keys[i])});
+                servers.push({key : keys[i],
+                			  value : $.jStorage.get(keys[i])
+                			  });
             }
             $("#serverSidebar").setTemplateElement("servers");
             $("#serverSidebar").processTemplate(servers);
             $('#serverSidebar p b').editable(function(value, settings) {
                 var key = $(this).parent().attr('id').replace("server-", "");
-                store.set(key, value);
+                $.jStorage.set(key, value);
                 $.terrastoreClient.setup({
-                    baseURL : store.get('1')
+                    baseURL : $.jStorage.get('1')
                 });
                 return (value);
             }, {
