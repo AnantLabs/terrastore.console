@@ -113,10 +113,12 @@
                         buttons: {
                             'Delete this item': function() {
                                 $(this).dialog('close');
+                                $(this).dialog('destroy');
                                 context.redirect(href);
                             },
                             Cancel: function() {
                                 $(this).dialog('close');
+                                $(this).dialog('destroy');
                             }
                         }
                     });
@@ -170,10 +172,12 @@
                         buttons: {
                             'Delete this item': function() {
                                 $(this).dialog('close');
+                                $(this).dialog('destroy');
                                 context.redirect(href);
                             },
                             Cancel: function() {
                                 $(this).dialog('close');
+                                $(this).dialog('destroy');
                             }
                         }
                     });
@@ -235,10 +239,12 @@
                         buttons: {
                             'Delete this item': function() {
                                 $(this).dialog('close');
+                                $(this).dialog('destroy');
                                 context.redirect(href);
                             },
                             Cancel: function() {
                                 $(this).dialog('close');
+                                $(this).dialog('destroy');
                             }
                         }
                     });
