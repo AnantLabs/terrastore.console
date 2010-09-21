@@ -254,7 +254,7 @@
             var from = this.params['from'];
             var to = this.params['to'];
             $.terrastoreClient.queryByRange(bucketName, from, to, function(values) {
-                if(!$.isArray(values)){
+                if(values == null){
                     	context.trigger('error',{message : corsMsg});
                     return;
                 }
