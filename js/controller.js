@@ -136,7 +136,7 @@
         this.get('#/view/bucket/:bucketName', function(context) {
             var bucketName = this.params['bucketName'];
             $.terrastoreClient.getAllValues(bucketName, function(values) {
-                if(!$.isArray(buckets)){
+                if(values == null){
                     	context.trigger('error',{message : corsMsg});
                     return;
                 }
