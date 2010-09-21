@@ -61,11 +61,6 @@
                 baseURL : $.jStorage.get('1')
             });
             
-            $.terrastoreClient.getBuckets(function(buckets) {
-                if(!$.isArray(buckets)){
-                	context.trigger('error',{message : corsMsg});
-                }
-            });
         });
 
         this.get('#/home', function() {
@@ -100,6 +95,10 @@
 
         this.get('#/buckets', function(context) {
             $.terrastoreClient.getBuckets(function(buckets) {
+                if(!$.isArray(buckets)){
+                    	context.trigger('error',{message : corsMsg});
+                    return;
+                }
                 $("#content").setTemplateElement("buckets");
                 $("#content").setParam('viewPath', "#/view/bucket/");
                 $("#content").setParam('removePath', "#/remove/");
@@ -137,6 +136,10 @@
         this.get('#/view/bucket/:bucketName', function(context) {
             var bucketName = this.params['bucketName'];
             $.terrastoreClient.getAllValues(bucketName, function(values) {
+                if(!$.isArray(buckets)){
+                    	context.trigger('error',{message : corsMsg});
+                    return;
+                }
                 var data = [];
                 for (var propertyName in values) {
                     data.push({key:propertyName, value:JSON.stringify(values[propertyName])});
@@ -203,6 +206,10 @@
             var key = this.params['key'];
             var bucketName = this.params['bucketName'];
             $.terrastoreClient.getValue(bucketName, key, function(value) {
+                if(value == null) {
+                    	context.trigger('error',{message : corsMsg});
+                    return;
+                }
                 $("#content").setTemplateElement("value");
                 $("#content").setParam('path', "#/remove/");
                 $("#content").setParam('bucketName', bucketName);
@@ -247,6 +254,10 @@
             var from = this.params['from'];
             var to = this.params['to'];
             $.terrastoreClient.queryByRange(bucketName, from, to, function(values) {
+                if(!$.isArray(values)){
+                    	context.trigger('error',{message : corsMsg});
+                    return;
+                }
                 var data = [];
                 for (var propertyName in values) {
                     data.push({key:propertyName, value:JSON.stringify(values[propertyName])});
@@ -310,8 +321,12 @@
             $(".ui-widget").effect("pulsate");
         });
 
-        this.get('#/stats', function() {
+        this.get('#/stats', function(context) {
             $.terrastoreClient.getValue("_stats", "cluster", function(value) {
+                if(value == null) {
+                    	context.trigger('error',{message : corsMsg});
+                    return;
+                }
                 $("#content").setTemplateElement("stats");
                 $("#content").processTemplate(value);
                 $("#clusters").tabs();
