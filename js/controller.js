@@ -3,8 +3,10 @@
  */
 (function($) {
     var app = $.sammy(function() {
-    	var corsMsg = 'Please Check Your Network and that CORS is enabled on your Terrastore server. ' +
-        			  'Check the <a href="http://code.google.com/p/terrastore/wiki/Operations#Setup_Cross_Origin_Resource_Sharing_support" TARGET="_blank">guide</a>.'
+        this.use(Sammy.Storage);
+        	var corsMsg = 'Please Check Your Network and that CORS is enabled on your Terrastore server. ' +
+        			  'Check the <a href="http://code.google.com/p/terrastore/wiki/Operations#Setup_Cross_Origin_Resource_Sharing_support" TARGET="_blank">guide</a>.';
+        			  
         this.bind('run', function() {
             var context = this;
             $("#navlist a").click(function() {
@@ -41,16 +43,26 @@
                     }
                 }
             });
+            
+            $.extend(Sammy.Store.LocalStorage.prototype, {
+                isAvailable: function() {
+                  return ('localStorage' in window);
+                }
+            });
 
             $("#progressbar").bind("ajaxSend", function() {
                 $("#progressbar").progressbar({value: 100});
             }).bind("ajaxComplete", function() {
                 $("#progressbar").progressbar("destroy");
             });
+
+        	    this.store('servers', {type: ['local','cookie']});		
+        		this.store('selectedServer', {type: ['local', 'cookie']});
             
-            if ($.jStorage.index().length < 1) {
+            if (this.store('servers').keys().length < 1) {
                 $.sammy.log("consoleStore initialiazing");
-                $.jStorage.set('1', 'http://localhost:8080');
+                this.servers('1', 'http://localhost:8080');
+                this.selectedServer('selected', '1');
 
             } else {
                 $.sammy.log("consoleStore already initialiazed");
@@ -58,39 +70,51 @@
             }
 
             $.terrastoreClient.setup({
-                baseURL : $.jStorage.get('1')
+                baseURL : this.servers(this.selectedServer('selected'))
             });
             
         });
 
-        this.get('#/home', function() {
+        this.bind('error', function(e, data) {
+            $("#content").setTemplateElement("error", [], {filter_data : false});
+            $("#content").processTemplate(data.message);
+            $(".ui-widget").effect("pulsate");
+        });
+
+        this.bind('servers', function(e, context) {
             var servers = [];
-            var keys = $.jStorage.index();
+            var keys = this.store('servers').keys();
             for (i = 0; i < keys.length; i++) {
-                servers.push({key : keys[i],
-                			  value : $.jStorage.get(keys[i])
-                			  });
+                servers.push({
+                              key : keys[i],
+                			      value : this.servers(keys[i])
+                });
             }
             $("#serverSidebar").setTemplateElement("servers");
             $("#serverSidebar").processTemplate(servers);
             $('#serverSidebar p b').editable(function(value, settings) {
                 var key = $(this).parent().attr('id').replace("server-", "");
-                $.jStorage.set(key, value);
-                $.terrastoreClient.setup({
-                    baseURL : $.jStorage.get('1')
-                });
+                context.servers(key, value);
+                if (context.selectedServer('selected') == key) {
+                    $.terrastoreClient.setup({
+                        baseURL : context.servers(key)
+                    });
+                }    
                 return (value);
             }, {
                 type      : 'text',
                 cancel    : 'Cancel',
                 submit    : 'Update',
                 style     : 'display: inline',
-                tooltip   : 'Click to edit...'
+                tooltip   : 'Click to edit...',
+                indicator : "<img src='images/loading.gif'>"
             });
+        });
 
+        this.get('#/home', function(context) {
             $("#content").setTemplateElement("home");
             $("#content").processTemplate(null);
-
+            this.trigger('servers', context);
         });
 
         this.get('#/buckets', function(context) {
@@ -161,7 +185,8 @@
                     cancel    : 'Cancel',
                     submit    : 'Update',
                     style     : 'display: inline',
-                    tooltip   : 'Click to edit...'
+                    tooltip   : 'Click to edit...',
+                    indicator : "<img src='images/loading.gif'>"
                 });
                 $("#content a[class=removeOp]").click(function() {
                     var href = $(this).attr("href");
@@ -228,7 +253,8 @@
                     cancel    : 'Cancel',
                     submit    : 'Update',
                     style     : 'display: inline',
-                    tooltip   : 'Click to edit...'
+                    tooltip   : 'Click to edit...',
+                    indicator : "<img src='images/loading.gif'>"
                 });
                 $("#content a[class=removeOp]").click(function() {
                     var href = $(this).attr("href");
@@ -283,7 +309,8 @@
                     cancel    : 'Cancel',
                     submit    : 'Update',
                     style     : 'display: inline',
-                    tooltip   : 'Click to edit...'
+                    tooltip   : 'Click to edit...',
+                    indicator : "<img src='images/loading.gif'>"
                 });
             });
 
@@ -321,12 +348,6 @@
             context.trigger('error',this.params['msg']);    
         });
         
-        this.bind('error', function(e, data) {
-            $("#content").setTemplateElement("error", [], {filter_data : false});
-            $("#content").processTemplate(data.message);
-            $(".ui-widget").effect("pulsate");
-        });
-
         this.get('#/stats', function(context) {
             $.terrastoreClient.getValue("_stats", "cluster", function(value) {
                 if(value == null) {
