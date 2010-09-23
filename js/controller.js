@@ -418,7 +418,7 @@
 
         this.get('#/about', function() {
             $("#content").setTemplateElement("about");
-            $("#content").processTemplate(null);
+            $("#content").processTemplate(version);
         });
 
     });
