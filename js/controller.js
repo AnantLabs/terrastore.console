@@ -6,7 +6,8 @@
         this.use(Sammy.Storage);
         	var corsMsg = 'Please Check Your Network and that CORS is enabled on your Terrastore server. ' +
         			      'Check the <a href="http://code.google.com/p/terrastore/wiki/Operations#Setup_Cross_Origin_Resource_Sharing_support" TARGET="_blank">guide</a>.';
-
+        var version = '0.2';
+        
         this.bind('run', function() {
             var context = this;
             $("#navlist a").click(function() {
@@ -58,12 +59,18 @@
 
         	    this.store('servers', {type: ['local','cookie']});		
         		this.store('status', {type: ['local', 'cookie']});
-            
+
+            if(this.status('version') != version) {
+                this.clearStatus();
+                this.clearServers();
+            }
+
             if (this.store('servers').keys().length < 1) {
                 $.sammy.log("consoleStore initialiazing");
                 this.servers(1, 'http://localhost:8080');
                 this.status('selected', 1);
                 this.status('serverSequence', 1);
+                this.status('version', version);
 
             } else {
                 $.sammy.log("consoleStore already initialiazed");
