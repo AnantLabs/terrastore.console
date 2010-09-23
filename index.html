@@ -26,7 +26,7 @@
     <script src="js/jquery-1.4.2.min.js" type="text/javascript"></script>
     <script src="js/jquery-ui-1.8.2.custom.min.js" type="text/javascript"></script>
     <script src="js/jquery-jtemplates.min.js" type="text/javascript"></script>
-    <script src="js/sammy-0.6.0.min.js" type="text/javascript"></script>
+    <script src="http://github.com/quirkey/sammy/raw/master/lib/sammy.js" type="text/javascript"></script>
     <script src="js/sammy.json-0.6.0.min.js" type="text/javascript"></script>
     <script src="js/sammy.storage-0.6.0.min.js" type="text/javascript"></script>        
     <script src="js/jpaginate.js" type="text/javascript"></script>
@@ -52,6 +52,9 @@ Flash-Templates-Today.com - Gives a possibility to obtain a ready free flash tem
             <li><a href="#/stats">Statistics</a></li>
             <li><a href="#/about">About</a></li>
             <li>
+                <div id="serversSelectContainer"><select id="serversSelect"></select></div>
+            </li>
+            <li>
                 <div id="progressbar"></div>
             </li>
         </ul>
@@ -61,13 +64,18 @@ Flash-Templates-Today.com - Gives a possibility to obtain a ready free flash tem
     <div id="serverSidebar">
     </div>
     <!-- end #sidebar1 -->
+     <div id="messageContent">
+        <div id="message">
+        </div>
+    </div>
     <!-- begin #mainContent -->
     <div id="mainContent">
         <div id="content">
         </div>
     </div>
     <!-- end #mainContent -->
-    <!-- This clearing element should immediately follow the #mainContent div in order to force the #container div to contain all child floats --><br class="clearfloat"/>
+    <!-- This clearing element should immediately follow the #mainContent div in order to force the #container div to contain all child floats -->
+    <br class="clearfloat"/>
     <!-- begin #footer -->
     <div id="footer">
         <p>
@@ -90,11 +98,9 @@ Flash-Templates-Today.com - Gives a possibility to obtain a ready free flash tem
 <div class="sidebarContent ui-corner-all">
     <h1>Setup</h1>
     {#foreach $T as row}
-    <p id="server-{$T.row.key}">
-        Server:
-        <b>{$T.row.value}</b><br/>
-    </p>
+        <p id="server-{$T.row.key}">Server-{$T.row$iteration + 1} : <b>{$T.row.value}</b> <a href="#/servers/remove/{$T.row.key}">Delete</a><br/></p>
     {#/for}
+    <a href="#/servers/add/{$P.timestamp}">Add a new server</a>
     <hr>
     <p>Click on server url to edit.</p>
 </div>
@@ -239,7 +245,7 @@ Flash-Templates-Today.com - Gives a possibility to obtain a ready free flash tem
 
 <p style="display:none"><textarea id="success" rows="0" cols="0"><!--
 <div class="content ui-corner-all">
-    <div class="ui-widget">
+    <div id="successWidget" class="ui-widget">
         <div class="ui-state-highlight ui-corner-all" style="padding: 0 .7em;">
             <p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>
             <strong>Operation completed.</strong></p>
@@ -252,7 +258,7 @@ Flash-Templates-Today.com - Gives a possibility to obtain a ready free flash tem
 <p style="display:none"><textarea id="error" rows="0" cols="0"><!--
 <div class="content ui-corner-all">
 
-    <div class="ui-widget">
+    <div id="errorWidget" class="ui-widget">
         <div class="ui-state-error ui-corner-all" style="padding: 0 .7em;">
 
             <p><span class="ui-icon ui-icon-alert" style="float: left; margin-right: .3em;"></span>

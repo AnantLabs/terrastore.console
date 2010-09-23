@@ -1,12 +1,12 @@
 /**
- *Main application to set sammy to work.
+ * Main application to set sammy to work.
  */
 (function($) {
     var app = $.sammy(function() {
         this.use(Sammy.Storage);
         	var corsMsg = 'Please Check Your Network and that CORS is enabled on your Terrastore server. ' +
-        			  'Check the <a href="http://code.google.com/p/terrastore/wiki/Operations#Setup_Cross_Origin_Resource_Sharing_support" TARGET="_blank">guide</a>.';
-        			  
+        			      'Check the <a href="http://code.google.com/p/terrastore/wiki/Operations#Setup_Cross_Origin_Resource_Sharing_support" TARGET="_blank">guide</a>.';
+
         this.bind('run', function() {
             var context = this;
             $("#navlist a").click(function() {
@@ -17,27 +17,27 @@
             $.ajaxSetup({
                 error:function(x, e) {
                     if (x.status == 0) {
-                        context.trigger('error',{message : 'You are offline!!<br> ' + corsMsg});
+                        context.trigger('onError',{message : 'You are offline!!<br> ' + corsMsg});
                         $.sammy.log(x.responseText)
 
                     } else if (x.status == 404) {
-                        context.trigger('error', {message: 'Requested URL not found.'});
+                        context.trigger('onError', {message: 'Requested URL not found.'});
                         $.sammy.log(x.responseText)
 
                     } else if (x.status == 500) {
-                        context.trigger('error', {message: 'Internel Server Error.'});
+                        context.trigger('onError', {message: 'Internel Server Error.'});
                         $.sammy.log(x.responseText)
 
                     } else if (e == 'parsererror') {
-                        context.trigger('error', {message: 'Error.\nParsing JSON Request failed.'});
+                        context.trigger('onError', {message: 'Error.\nParsing JSON Request failed.'});
                         $.sammy.log(x.responseText)
 
                     } else if (e == 'timeout') {
-                        context.trigger('error', {message: 'Request Time out.'});
+                        context.trigger('onError', {message: 'Request Time out.'});
                         $.sammy.log(x.responseText)
 
                     } else {
-                        context.trigger('error',{message : 'Unknow Error.<br> ' + corsMsg });
+                        context.trigger('onError',{message : 'Unknow Error.<br> ' + corsMsg });
                         $.sammy.log(x.responseText);
 
                     }
@@ -57,31 +57,72 @@
             });
 
         	    this.store('servers', {type: ['local','cookie']});		
-        		this.store('selectedServer', {type: ['local', 'cookie']});
+        		this.store('status', {type: ['local', 'cookie']});
             
             if (this.store('servers').keys().length < 1) {
                 $.sammy.log("consoleStore initialiazing");
-                this.servers('1', 'http://localhost:8080');
-                this.selectedServer('selected', '1');
+                this.servers(1, 'http://localhost:8080');
+                this.status('selected', 1);
+                this.status('serverSequence', 1);
 
             } else {
                 $.sammy.log("consoleStore already initialiazed");
 
             }
 
-            $.terrastoreClient.setup({
-                baseURL : this.servers(this.selectedServer('selected'))
-            });
+            this.trigger('renderServersSelect', context);            
             
         });
 
-        this.bind('error', function(e, data) {
-            $("#content").setTemplateElement("error", [], {filter_data : false});
-            $("#content").processTemplate(data.message);
-            $(".ui-widget").effect("pulsate");
+        this.bind('onSuccess', function() {
+            $('#messageContent').show();
+            $("#message").setTemplateElement("success");
+            $("#message").processTemplate(null);
+            $("#successWidget").effect("pulsate");
         });
 
-        this.bind('servers', function(e, context) {
+        this.bind('onError', function(e, data) {
+            $('#messageContent').show();
+            $("#message").setTemplateElement("error", [], {filter_data : false});
+            $("#message").processTemplate(data.message);
+            $("#errorWidget").effect("pulsate");
+        });
+
+        /**
+         * clear the message before view a new page.
+         */
+        this.bind('event-context-before', function(e, data) {
+            $('#messageContent').hide();
+            $("#message").html('');
+            $("#content").html('');
+        });
+
+        /**
+         * renders the select that contains the servers.
+         */
+        this.bind('renderServersSelect', function(e, context) {
+            $("#serversSelect").html('');
+            var keys = this.store('servers').keys();
+            for (i = 0; i < keys.length; i++) {
+                if(!context.servers(context.status('selected')) && i == 0) {
+                    context.status('selected', keys[i]);                
+                }
+                var option = document.createElement("option");
+        		    option.value = keys[i], option.text = 'Server-' + (i + 1);
+        		    $("#serversSelect")[0].options[i] = option;        		    
+            }
+            $("#serversSelect option[value='" + this.status('selected') + "']").attr('selected', 'selected');
+            $("#serversSelect").change(function() {
+                $("select option:selected").each(function () {
+                    context.status('selected', $(this).val()); 
+                    $.terrastoreClient.options.baseURL = context.servers(context.status('selected'));
+                });
+            });
+            
+            $.terrastoreClient.options.baseURL = context.servers(context.status('selected'));
+        });
+
+        this.bind('renderServers', function(e, context) {
             var servers = [];
             var keys = this.store('servers').keys();
             for (i = 0; i < keys.length; i++) {
@@ -91,15 +132,12 @@
                 });
             }
             $("#serverSidebar").setTemplateElement("servers");
+            $("#serverSidebar").setParam('timestamp', new Date().getTime());
             $("#serverSidebar").processTemplate(servers);
             $('#serverSidebar p b').editable(function(value, settings) {
                 var key = $(this).parent().attr('id').replace("server-", "");
                 context.servers(key, value);
-                if (context.selectedServer('selected') == key) {
-                    $.terrastoreClient.setup({
-                        baseURL : context.servers(key)
-                    });
-                }    
+                $.terrastoreClient.options.baseURL = context.servers(context.status('selected'));
                 return (value);
             }, {
                 type      : 'text',
@@ -114,13 +152,34 @@
         this.get('#/home', function(context) {
             $("#content").setTemplateElement("home");
             $("#content").processTemplate(null);
-            this.trigger('servers', context);
+            this.trigger('renderServers', context);
+        });
+
+        this.get('#/servers/add/:timestamp', function(context) {
+            var next = this.status('serverSequence') + 1;
+            this.servers(next, 'http://localhost:8080');
+            this.status('serverSequence', next);
+            this.trigger('renderServers', context);
+            this.trigger('renderServersSelect', context);
+        });
+
+        this.get('#/servers/remove/:key', function(context) {
+            if (this.store('servers').keys().length > 1) {
+                this.store('servers').clear(this.params['key']);
+                this.trigger('renderServers', context);
+                this.trigger('renderServersSelect', context);
+                
+            } else {
+                this.trigger('onError', {message : 'You can not delete the last server.'});
+
+            }
+            
         });
 
         this.get('#/buckets', function(context) {
             $.terrastoreClient.getBuckets(function(buckets) {
                 if(!$.isArray(buckets)){
-                    	context.trigger('error',{message : corsMsg});
+                    	context.trigger('onError',{message : corsMsg});
                     return;
                 }
                 $("#content").setTemplateElement("buckets");
@@ -163,7 +222,7 @@
             var bucketName = this.params['bucketName'];
             $.terrastoreClient.getAllValues(bucketName, function(values) {
                 if(values == null){
-                    	context.trigger('error',{message : corsMsg});
+                    	context.trigger('onError',{message : corsMsg});
                     return;
                 }
                 var data = [];
@@ -236,7 +295,7 @@
             var bucketName = this.params['bucketName'];
             $.terrastoreClient.getValue(bucketName, key, function(value) {
                 if(value == null) {
-                    	context.trigger('error',{message : corsMsg});
+                    	context.trigger('onError',{message : corsMsg});
                     return;
                 }
                 $("#content").setTemplateElement("value");
@@ -287,7 +346,7 @@
             var to = this.params['to'];
             $.terrastoreClient.queryByRange(bucketName, from, to, function(values) {
                 if(values == null){
-                    	context.trigger('error',{message : corsMsg});
+                    	context.trigger('onError',{message : corsMsg});
                     return;
                 }
                 var data = [];
@@ -326,7 +385,7 @@
             var bucketName = this.params['bucketName'];
             var destination = this.params['destination'];
             $.terrastoreClient.exportBackup(bucketName, destination, {successCallback:function() {
-                context.redirect("#/success");
+                context.trigger("onSuccess");
             }});
         });
 
@@ -334,24 +393,14 @@
             var bucketName = this.params['bucketName'];
             var source = this.params['source'];
             $.terrastoreClient.importBackup(bucketName, source, {successCallback:function() {
-                context.redirect("#/success");
+                context.trigger("onSuccess");
             }});
-        });
-
-        this.get('#/success', function() {
-            $("#content").setTemplateElement("success");
-            $("#content").processTemplate(null);
-            $(".ui-widget").effect("pulsate");
-        });
-        
-        this.get('#/error/:msg', function() {
-            context.trigger('error',this.params['msg']);    
         });
         
         this.get('#/stats', function(context) {
             $.terrastoreClient.getValue("_stats", "cluster", function(value) {
                 if(value == null) {
-                    	context.trigger('error',{message : corsMsg});
+                    	context.trigger('onError',{message : corsMsg});
                     return;
                 }
                 $("#content").setTemplateElement("stats");
