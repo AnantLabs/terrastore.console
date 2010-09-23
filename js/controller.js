@@ -76,8 +76,8 @@
                 $.sammy.log("consoleStore already initialiazed");
 
             }
-
-            this.trigger('renderServersSelect', context);            
+            this.trigger('renderServers', context);
+            this.trigger('renderServersSelect', context);
             
         });
 
@@ -159,7 +159,6 @@
         this.get('#/home', function(context) {
             $("#content").setTemplateElement("home");
             $("#content").processTemplate(null);
-            this.trigger('renderServers', context);
         });
 
         this.get('#/servers/add/:timestamp', function(context) {
