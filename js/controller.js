@@ -176,7 +176,7 @@
                 this.trigger('renderServersSelect', context);
                 
             } else {
-                this.trigger('onError', {message : 'You can not delete the last server.'});
+                this.trigger('onError', {message : 'You must keep at least one server in the list.'});
 
             }
             
