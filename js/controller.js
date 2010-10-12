@@ -161,6 +161,25 @@
             $("#content").processTemplate(null);
         });
 
+        this.get('#/importClusterConfiguration/:clusterIdx', function(context) {
+            $.terrastoreClient.getValue("_stats", "cluster", function(value) {
+                if(value == null) {
+                    	context.trigger('onError',{message : corsMsg});
+                    return;
+                }
+                var clusterIdx = context.params['clusterIdx'];
+                for (nodeIdx = 0; nodeIdx < value.clusters[clusterIdx].nodes.length; nodeIdx++) {
+                    var node = value.clusters[clusterIdx].nodes[nodeIdx];
+                    var next = context.status('serverSequence') + 1;
+                    context.servers(next, 'http://' + node.host + ':' + node.port);
+                    context.status('serverSequence', next);
+                }
+                context.trigger('renderServers', context);
+                context.trigger('renderServersSelect', context);
+                context.trigger('onSuccess', context);
+           }); 
+        });
+
         this.get('#/servers/add/:timestamp', function(context) {
             var next = this.status('serverSequence') + 1;
             this.servers(next, 'http://localhost:8080');
