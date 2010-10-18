@@ -161,22 +161,33 @@
             $("#content").processTemplate(null);
         });
 
-        this.get('#/importClusterConfiguration/:clusterIdx', function(context) {
+        this.get('#/importClusterConfiguration/:cluster', function(context) {
             $.terrastoreClient.getValue("_stats", "cluster", function(value) {
                 if(value == null) {
-                    	context.trigger('onError',{message : corsMsg});
+                    context.trigger('onError',{message : corsMsg});
                     return;
+                } else {
+                    var clusterName = context.params['cluster'];
+                    var clusterIdx = -1;
+                    $.each(value.clusters, function(index, value) {if (value.name == clusterName) clusterIdx = index});
+                    if (clusterIdx > -1) {
+                        for (nodeIdx = 0; nodeIdx < value.clusters[clusterIdx].nodes.length; nodeIdx++) {
+                            var node = value.clusters[clusterIdx].nodes[nodeIdx];
+                            var address = 'http://' + node.host + ':' + node.port;
+                            if (context.store('servers').filter(function(key, value) {return (value == address)}).length == 0) {
+                                var sequence = context.status('serverSequence') + 1;
+                                context.status('serverSequence', sequence);
+                                context.servers(sequence, address);
+                            }
+                        }
+                        context.trigger('renderServers', context);
+                        context.trigger('renderServersSelect', context);
+                        context.trigger('onSuccess', context);
+                    } else {
+                        context.trigger('onError',{message : "Cluster seems to be unavailable!"});
+                        return;
+                    }
                 }
-                var clusterIdx = context.params['clusterIdx'];
-                for (nodeIdx = 0; nodeIdx < value.clusters[clusterIdx].nodes.length; nodeIdx++) {
-                    var node = value.clusters[clusterIdx].nodes[nodeIdx];
-                    var next = context.status('serverSequence') + 1;
-                    context.servers(next, 'http://' + node.host + ':' + node.port);
-                    context.status('serverSequence', next);
-                }
-                context.trigger('renderServers', context);
-                context.trigger('renderServersSelect', context);
-                context.trigger('onSuccess', context);
            }); 
         });
 
