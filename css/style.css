@@ -213,3 +213,7 @@ form p label {
 #clusters .clusters-UNAVAILABLE {
     color: red;
 }
+
+#importClustersConfiguration a {
+    color: #666699;    
+}
