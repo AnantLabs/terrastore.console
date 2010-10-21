@@ -242,6 +242,27 @@
                 error: currentOptions.errorCallback
             });
         },
+        
+        /**
+         * Execute a map-reduce query over the given bucket.
+         *
+         * @param bucket The bucket to query.
+         * @param descriptor The map-reduce query descriptor.
+         */
+         queryByMapReduce:function(bucket, descriptor, successCallback, options) {
+            $.terrastoreClient.checkNotNull(bucket, descriptor);
+            var currentOptions = $.extend(true, {}, $.terrastoreClient.options, {successCallback:successCallback}, options);
+            $.ajax({
+                url: currentOptions.baseURL + "/" + bucket + "/mapReduce",
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(descriptor),
+                dataType:"json",
+                processData: false,
+                success: currentOptions.successCallback,
+                error: currentOptions.errorCallback
+            });
+        },
 
         /**
          * Execute the import of all bucket key/value entries, without interrupting other operations and preserving

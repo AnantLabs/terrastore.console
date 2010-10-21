@@ -196,6 +196,27 @@ Flash-Templates-Today.com - Gives a possibility to obtain a ready free flash tem
         <p><input type="submit" value="Search" /></p>
     </form>
 </div>
+
+<div class="content ui-corner-all">
+    <h1>Search with Map Reduce</h1>
+    <form action="#/search/mapReduce" method="post">
+        <p><label for="bucket">Bucket:</label><input type="text" name="bucketName"/></p>
+        <h3>Task</h3>
+        <hr>
+        <p><label for="mapper">Mapper:</label><input type="text" name="mapper"/></p>
+        <p><label for="reducer">Reducer:</label><input type="text" name="reducer"/></p>
+        <p><label for="timeout">Timeout:</label><input type="text" name="timeout"/></p>
+        <p><label for="combiner">Combiner:</label><input type="text" name="combiner"/></p>
+        <p><label for="parameters">Parameters:</label><input type="text" name="parameters"/></p>
+        <h3>Range</h3>
+        <hr>
+        <p><label for="startKey">StartKey:</label><input type="text" name="startKey"/></p>
+        <p><label for="endKey">EndKey:</label><input type="text" name="endKey"/></p>
+        <p><label for="comparator">Comparator:</label><input type="text" name="comparator"/></p>
+        <p><label for="timeToLive">TimeToLive:</label><input type="text" name="timeToLive"/></p>
+        <p><input type="submit" value="Search" /></p>
+    </form>
+</div>
     --></textarea>
 </p>
 
@@ -219,6 +240,22 @@ Flash-Templates-Today.com - Gives a possibility to obtain a ready free flash tem
 </div>
 <div id="remove-confirm" title="Do you want to remove it?" style="display:none">
     <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>These item will be permanently deleted and cannot be recovered. Are you sure?</p>
+</div>
+    --></textarea>
+</p>
+
+<p style="display:none"><textarea id="mapReduceResult" rows="0" cols="0"><!--
+<div class="content ui-corner-all">
+    <table id="hor-minimalist-a" class="pp">
+        <thead>
+        <tr>
+            <th>Value</th>
+        </tr>
+        </thead>
+        <tr>
+            <td class="value">{$T}</td>
+        </tr>
+    </table>
 </div>
     --></textarea>
 </p>
