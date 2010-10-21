@@ -4,10 +4,10 @@
 (function($) {
     var app = $.sammy(function() {
         this.use(Sammy.Storage);
-        	var corsMsg = 'Please Check Your Network and that CORS is enabled on your Terrastore server. ' +
-        			      'Check the <a href="http://code.google.com/p/terrastore/wiki/Operations#Setup_Cross_Origin_Resource_Sharing_support" TARGET="_blank">guide</a>.';
+        var corsMsg = 'Please Check Your Network and that CORS is enabled on your Terrastore server. ' +
+            	      'Check the <a href="http://code.google.com/p/terrastore/wiki/Operations#Setup_Cross_Origin_Resource_Sharing_support" TARGET="_blank">guide</a>.';
         var version = '0.2';
-        
+
         this.bind('run', function() {
             var context = this;
             $("#navlist a").click(function() {
@@ -44,7 +44,7 @@
                     }
                 }
             });
-            
+
             $.extend(Sammy.Store.LocalStorage.prototype, {
                 isAvailable: function() {
                   return ('localStorage' in window);
@@ -57,7 +57,7 @@
                 $("#progressbar").progressbar("destroy");
             });
 
-        	    this.store('servers', {type: ['local','cookie']});		
+        	    this.store('servers', {type: ['local','cookie']});
         		this.store('status', {type: ['local', 'cookie']});
 
             if(this.status('version') != version) {
@@ -78,7 +78,7 @@
             }
             this.trigger('renderServers', context);
             this.trigger('renderServersSelect', context);
-            
+
         });
 
         this.bind('onSuccess', function() {
@@ -112,20 +112,20 @@
             var keys = this.store('servers').keys();
             for (i = 0; i < keys.length; i++) {
                 if(!context.servers(context.status('selected')) && i == 0) {
-                    context.status('selected', keys[i]);                
+                    context.status('selected', keys[i]);
                 }
                 var option = document.createElement("option");
         		    option.value = keys[i], option.text = 'Server-' + (i + 1);
-        		    $("#serversSelect")[0].options[i] = option;        		    
+        		    $("#serversSelect")[0].options[i] = option;
             }
             $("#serversSelect option[value='" + this.status('selected') + "']").attr('selected', 'selected');
             $("#serversSelect").change(function() {
                 $("select option:selected").each(function () {
-                    context.status('selected', $(this).val()); 
+                    context.status('selected', $(this).val());
                     $.terrastoreClient.options.baseURL = context.servers(context.status('selected'));
                 });
             });
-            
+
             $.terrastoreClient.options.baseURL = context.servers(context.status('selected'));
         });
 
@@ -188,7 +188,7 @@
                         return;
                     }
                 }
-           }); 
+           });
         });
 
         this.get('#/servers/add/:timestamp', function(context) {
@@ -204,12 +204,12 @@
                 this.store('servers').clear(this.params['key']);
                 this.trigger('renderServers', context);
                 this.trigger('renderServersSelect', context);
-                
+
             } else {
                 this.trigger('onError', {message : 'You must keep at least one server in the list.'});
 
             }
-            
+
         });
 
         this.get('#/buckets', function(context) {
@@ -411,6 +411,45 @@
 
         });
 
+        this.post('#/search/mapReduce', function(context) {
+            var bucketName = this.params['bucketName'];
+            var mapper = this.params['mapper'];
+            var reducer = this.params['reducer'];
+            var timeout = this.params['timeout'];
+            var combiner = this.params['combiner'];
+            var parameters = this.params['parameters'];
+            var descriptor = {
+                task : {
+                    mapper:  mapper,
+                    reducer: reducer,
+                    timeout: timeout,
+                    combiner:combiner,
+                    parameters:parameters
+                },
+                range:null
+            }
+
+            var startKey = this.params['startKey'];
+            var endKey = this.params['endKey'];
+            var comparator = this.params['comparator'];
+            var timeToLive = this.params['timeToLive'];
+            descriptor.range =  {
+                    startKey:startKey,
+                    endKey: endKey,
+                    comparator:comparator,
+                    timeToLive:timeToLive
+            }
+            $.terrastoreClient.queryByMapReduce(bucketName, descriptor, function(value) {
+                if(values == null){
+                    	context.trigger('onError',{message : corsMsg});
+                    return;
+                }
+                $("#content").setTemplateElement("mapReduceResult");
+                $("#content").processTemplate(JSON.stringify(value));
+            });
+
+        });
+
         this.get('#/exportImport', function() {
             $("#content").setTemplateElement("exportImport");
             $("#content").processTemplate(null);
@@ -432,7 +471,7 @@
                 context.trigger("onSuccess");
             }});
         });
-        
+
         this.get('#/stats', function(context) {
             $.terrastoreClient.getValue("_stats", "cluster", function(value) {
                 if(value == null) {
