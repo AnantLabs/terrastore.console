@@ -408,6 +408,10 @@
                     startKey: "Please enter the range start key."
                 }
             });
+            $("#searchMenu").accordion({
+                autoHeight: false,
+                navigation: true
+            });
         });
 
         this.post('#/search/value', function(context) {

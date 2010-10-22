@@ -216,6 +216,14 @@ form p label.error {
     color:red;
 }
 
+#searchMenu .ui-state-active a:link{
+    color:#459E00;
+}
+
+#searchMenu a {
+    color:white;
+}
+
 #rangeBox.disabled {
     color:gray;
 }
