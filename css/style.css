@@ -216,6 +216,15 @@ form p label.error {
     color:red;
 }
 
+#rangeBox.disabled {
+    color:gray;
+}
+
+#rangeBox.rangeIcon {
+    float: left; 
+    margin-right: .3em;"
+}
+
 
 #clusters .clusters-UNAVAILABLE {
     color: red;
