@@ -376,12 +376,14 @@
                 }
             });
 
-            $('#rangeClick').click(function() {
-                $('#rangeBox').toggle('slow');
+            $("#rangeClick").click(function() {
+                $("#rangeBox input").attr('disabled', !$("#rangeBox input").attr('disabled'));
+                $("#rangeBox").toggleClass("disabled");
+                $("#rangeClick span").toggleClass("ui-icon-circle-minus");
+                $("#rangeClick span").toggleClass("ui-icon-circle-plus");
                 return false;
-            });
-            $('#rangeBox').hide();
-
+            }).click();
+            
             $("#searchMapReduce").validate({
                 rules: {
                     bucketName: "required",
@@ -392,7 +394,7 @@
                         min: 1
                     },
                     startKey: {
-                        required: "#rangeBox:not(:hidden)"
+                        required: "#rangeBox input:enabled"
                     }
                 },
                 messages: {
