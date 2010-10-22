@@ -228,7 +228,11 @@ form p label.error {
     color:gray;
 }
 
-#rangeBox.rangeIcon {
+#rangeClick:hover {
+    cursor:pointer;
+}
+
+span.rangeIcon {
     float: left; 
     margin-right: .3em;"
 }
