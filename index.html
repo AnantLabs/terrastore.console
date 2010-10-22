@@ -179,46 +179,47 @@ Flash-Templates-Today.com - Gives a possibility to obtain a ready free flash tem
 </p>
 
 <p style="display:none"><textarea id="searchValue" rows="0" cols="0"><!--
-<div class="content ui-corner-all">
-    <h1>Search by key</h1>
-    <form action="#/search/value" method="post" id="searchKey">
-        <p><label for="bucket">Bucket:</label><input type="text" name="bucketName"/></p>
-        <p><label for="key">Key:</label><input type="text" name="key"/></p>
-        <p><input type="submit" value="Search" /></p>
-    </form>
-</div>
+<div id="searchMenu">
+    <h1><a href="#">Search by key</a></h1>
+    <div>
+        <form action="#/search/value" method="post" id="searchKey">
+            <p><label for="bucket">Bucket:</label><input type="text" name="bucketName"/></p>
+            <p><label for="key">Key:</label><input type="text" name="key"/></p>
+            <p><input type="submit" value="Search" /></p>
+        </form>
+    </div>
+    <h1><a href="#">Search by range</a></h1>
+    <div>
+        <form action="#/search/range" method="post" id="searchRange">
+            <p><label for="bucket">Bucket:</label><input type="text" name="bucketName"/></p>
+            <p><label for="from">From:</label><input type="text" name="from"/></p>
+            <p><label for="to">To:</label><input type="text" name="to"/></p>
+            <p><input type="submit" value="Search" /></p>
+        </form>
+    </div>
 
-<div class="content ui-corner-all">
-    <h1>Search by range</h1>
-    <form action="#/search/range" method="post" id="searchRange">
-        <p><label for="bucket">Bucket:</label><input type="text" name="bucketName"/></p>
-        <p><label for="from">From:</label><input type="text" name="from"/></p>
-        <p><label for="to">To:</label><input type="text" name="to"/></p>
-        <p><input type="submit" value="Search" /></p>
-    </form>
-</div>
-
-<div class="content ui-corner-all">
-    <h1>Search with Map Reduce</h1>
-    <form action="#/search/mapReduce" method="post" id="searchMapReduce">
-        <p><label for="bucket">Bucket:</label><input type="text" name="bucketName"/></p>
-        <h3>Task</h3>
-        <hr>
-        <p><label for="mapper">Mapper:</label><input type="text" name="mapper"/></p>
-        <p><label for="reducer">Reducer:</label><input type="text" name="reducer"/></p>
-        <p><label for="timeout">Timeout:</label><input type="text" name="timeout"/></p>
-        <p><label for="combiner">Combiner:</label><input type="text" name="combiner"/></p>
-        <p><label for="parameters">Parameters:</label><input type="text" name="parameters"/></p>
-        <div id="rangeClick"><span class="ui-icon ui-icon-circle-minus rangeIcon" style="float: left; margin-right: .3em;"></span><h3>Range</h3></div>
-        <hr>
-        <div id="rangeBox">
-            <p><label for="startKey">StartKey:</label><input type="text" name="startKey"/></p>
-            <p><label for="endKey">EndKey:</label><input type="text" name="endKey"/></p>
-            <p><label for="comparator">Comparator:</label><input type="text" name="comparator"/></p>
-            <p><label for="timeToLive">TimeToLive:</label><input type="text" name="timeToLive"/></p>
-        </div>
-        <p><input type="submit" value="Search" /></p>
-    </form>
+    <h1><a href="#">Search with Map Reduce</a></h1>
+    <div>
+        <form action="#/search/mapReduce" method="post" id="searchMapReduce">
+            <p><label for="bucket">Bucket:</label><input type="text" name="bucketName"/></p>
+            <h3>Task</h3>
+            <hr>
+            <p><label for="mapper">Mapper:</label><input type="text" name="mapper"/></p>
+            <p><label for="reducer">Reducer:</label><input type="text" name="reducer"/></p>
+            <p><label for="timeout">Timeout:</label><input type="text" name="timeout"/></p>
+            <p><label for="combiner">Combiner:</label><input type="text" name="combiner"/></p>
+            <p><label for="parameters">Parameters:</label><input type="text" name="parameters"/></p>
+            <div id="rangeClick"><span class="ui-icon ui-icon-circle-minus rangeIcon" style="float: left; margin-right: .3em;"></span><h3>Range</h3></div>
+            <hr>
+            <div id="rangeBox">
+                <p><label for="startKey">StartKey:</label><input type="text" name="startKey"/></p>
+                <p><label for="endKey">EndKey:</label><input type="text" name="endKey"/></p>
+                <p><label for="comparator">Comparator:</label><input type="text" name="comparator"/></p>
+                <p><label for="timeToLive">TimeToLive:</label><input type="text" name="timeToLive"/></p>
+            </div>
+            <p><input type="submit" value="Search" /></p>
+        </form>
+    </div>
 </div>
     --></textarea>
 </p>
