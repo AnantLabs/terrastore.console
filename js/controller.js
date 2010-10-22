@@ -5,7 +5,7 @@
     var app = $.sammy(function() {
         this.use(Sammy.Storage);
         var corsMsg = 'Please Check Your Network and that CORS is enabled on your Terrastore server. ' +
-            	      'Check the <a href="http://code.google.com/p/terrastore/wiki/Operations#Setup_Cross_Origin_Resource_Sharing_support" TARGET="_blank">guide</a>.';
+                'Check the <a href="http://code.google.com/p/terrastore/wiki/Operations#Setup_Cross_Origin_Resource_Sharing_support" TARGET="_blank">guide</a>.';
         var version = '0.2';
 
         this.bind('run', function() {
@@ -18,7 +18,7 @@
             $.ajaxSetup({
                 error:function(x, e) {
                     if (x.status == 0) {
-                        context.trigger('onError',{message : 'You are offline!!<br> ' + corsMsg});
+                        context.trigger('onError', {message : 'You are offline!!<br> ' + corsMsg});
                         $.sammy.log(x.responseText)
 
                     } else if (x.status == 404) {
@@ -38,7 +38,7 @@
                         $.sammy.log(x.responseText)
 
                     } else {
-                        context.trigger('onError',{message : 'Unknow Error.<br> ' + corsMsg });
+                        context.trigger('onError', {message : 'Unknow Error.<br> ' + corsMsg });
                         $.sammy.log(x.responseText);
 
                     }
@@ -47,7 +47,7 @@
 
             $.extend(Sammy.Store.LocalStorage.prototype, {
                 isAvailable: function() {
-                  return ('localStorage' in window);
+                    return ('localStorage' in window);
                 }
             });
 
@@ -57,10 +57,10 @@
                 $("#progressbar").progressbar("destroy");
             });
 
-        	    this.store('servers', {type: ['local','cookie']});
-        		this.store('status', {type: ['local', 'cookie']});
+            this.store('servers', {type: ['local','cookie']});
+            this.store('status', {type: ['local', 'cookie']});
 
-            if(this.status('version') != version) {
+            if (this.status('version') != version) {
                 this.clearStatus();
                 this.clearServers();
             }
@@ -111,12 +111,12 @@
             $("#serversSelect").html('');
             var keys = this.store('servers').keys();
             for (i = 0; i < keys.length; i++) {
-                if(!context.servers(context.status('selected')) && i == 0) {
+                if (!context.servers(context.status('selected')) && i == 0) {
                     context.status('selected', keys[i]);
                 }
                 var option = document.createElement("option");
-        		    option.value = keys[i], option.text = 'Server-' + (i + 1);
-        		    $("#serversSelect")[0].options[i] = option;
+                option.value = keys[i],option.text = 'Server-' + (i + 1);
+                $("#serversSelect")[0].options[i] = option;
             }
             $("#serversSelect option[value='" + this.status('selected') + "']").attr('selected', 'selected');
             $("#serversSelect").change(function() {
@@ -134,8 +134,8 @@
             var keys = this.store('servers').keys();
             for (i = 0; i < keys.length; i++) {
                 servers.push({
-                              key : keys[i],
-                			      value : this.servers(keys[i])
+                    key : keys[i],
+                    value : this.servers(keys[i])
                 });
             }
             $("#serverSidebar").setTemplateElement("servers");
@@ -163,18 +163,22 @@
 
         this.get('#/importClusterConfiguration/:cluster', function(context) {
             $.terrastoreClient.getValue("_stats", "cluster", function(value) {
-                if(value == null) {
-                    context.trigger('onError',{message : corsMsg});
+                if (value == null) {
+                    context.trigger('onError', {message : corsMsg});
                     return;
                 } else {
                     var clusterName = context.params['cluster'];
                     var clusterIdx = -1;
-                    $.each(value.clusters, function(index, value) {if (value.name == clusterName) clusterIdx = index});
+                    $.each(value.clusters, function(index, value) {
+                        if (value.name == clusterName) clusterIdx = index
+                    });
                     if (clusterIdx > -1) {
                         for (nodeIdx = 0; nodeIdx < value.clusters[clusterIdx].nodes.length; nodeIdx++) {
                             var node = value.clusters[clusterIdx].nodes[nodeIdx];
                             var address = 'http://' + node.host + ':' + node.port;
-                            if (context.store('servers').filter(function(key, value) {return (value == address)}).length == 0) {
+                            if (context.store('servers').filter(function(key, value) {
+                                return (value == address)
+                            }).length == 0) {
                                 var sequence = context.status('serverSequence') + 1;
                                 context.status('serverSequence', sequence);
                                 context.servers(sequence, address);
@@ -184,11 +188,11 @@
                         context.trigger('renderServersSelect', context);
                         context.trigger('onSuccess', context);
                     } else {
-                        context.trigger('onError',{message : "Cluster seems to be unavailable!"});
+                        context.trigger('onError', {message : "Cluster seems to be unavailable!"});
                         return;
                     }
                 }
-           });
+            });
         });
 
         this.get('#/servers/add/:timestamp', function(context) {
@@ -214,8 +218,8 @@
 
         this.get('#/buckets', function(context) {
             $.terrastoreClient.getBuckets(function(buckets) {
-                if(!$.isArray(buckets)){
-                    	context.trigger('onError',{message : corsMsg});
+                if (!$.isArray(buckets)) {
+                    context.trigger('onError', {message : corsMsg});
                     return;
                 }
                 $("#content").setTemplateElement("buckets");
@@ -243,6 +247,19 @@
                     });
                     return false;
                 });
+
+                $("#putBuckets").validate({
+                    rules: {
+                        bucketName: "required",
+                        key: "required",
+                        value: "required"
+                    },
+                    messages: {
+                        bucketName: "Please enter the bucket name.",
+                        key: "Please enter the bucket key.",
+                        value: "Please enter the bucket value."
+                    }
+                });
             });
 
         });
@@ -257,8 +274,8 @@
         this.get('#/view/bucket/:bucketName', function(context) {
             var bucketName = this.params['bucketName'];
             $.terrastoreClient.getAllValues(bucketName, function(values) {
-                if(values == null){
-                    	context.trigger('onError',{message : corsMsg});
+                if (values == null) {
+                    context.trigger('onError', {message : corsMsg});
                     return;
                 }
                 var data = [];
@@ -303,6 +320,16 @@
                     });
                     return false;
                 });
+                $("#putBuckets").validate({
+                    rules: {
+                        key: "required",
+                        value: "required"
+                    },
+                    messages: {
+                        key: "Please enter the bucket key.",
+                        value: "Please enter the bucket value."
+                    }
+                });
             });
         });
 
@@ -324,14 +351,69 @@
             $("#content").setTemplateElement("searchValue");
             $("#content").processTemplate(null);
             $('#content input:submit').button();
+
+            $("#searchKey").validate({
+                rules: {
+                    bucketName: "required",
+                    key: "required"
+                },
+                messages: {
+                    bucketName: "Please enter the bucket name.",
+                    key: "Please enter the bucket key."
+                }
+            });
+
+            $("#searchRange").validate({
+                rules: {
+                    bucketName: "required",
+                    from: "required",
+                    to:"required"
+                },
+                messages: {
+                    bucketName: "Please enter the bucket name.",
+                    from: "Please enter the range start key.",
+                    to: "Please enter the range end key."
+                }
+            });
+
+            $('#rangeClick').click(function() {
+                $('#rangeBox').toggle('slow');
+                return false;
+            });
+            $('#rangeBox').hide();
+            
+            $("#searchMapReduce").validate({
+                rules: {
+                    bucketName: "required",
+                    mapper: "required",
+                    reducer: "required",
+                    timeout: {
+                        required: true,
+                        min: 1
+                    },
+                    startKey: {
+                        required: "#rangeBox:not(:hidden)"
+                    }
+                },
+                messages: {
+                    bucketName: "Please enter the bucket name.",
+                    mapper: "Please enter your mapper.",
+                    reducer: "Please enter your reducer.",
+                    timeout:  {
+                        required: "Please enter the timeout.",
+                        min: "Please enter a timeout greater than 0."
+                    },
+                    startKey: "Please enter the range start key."
+                }
+            });
         });
 
         this.post('#/search/value', function(context) {
             var key = this.params['key'];
             var bucketName = this.params['bucketName'];
             $.terrastoreClient.getValue(bucketName, key, function(value) {
-                if(value == null) {
-                    	context.trigger('onError',{message : corsMsg});
+                if (value == null) {
+                    context.trigger('onError', {message : corsMsg});
                     return;
                 }
                 $("#content").setTemplateElement("value");
@@ -381,8 +463,8 @@
             var from = this.params['from'];
             var to = this.params['to'];
             $.terrastoreClient.queryByRange(bucketName, from, to, function(values) {
-                if(values == null){
-                    	context.trigger('onError',{message : corsMsg});
+                if (values == null) {
+                    context.trigger('onError', {message : corsMsg});
                     return;
                 }
                 var data = [];
@@ -433,15 +515,15 @@
             var endKey = this.params['endKey'];
             var comparator = this.params['comparator'];
             var timeToLive = this.params['timeToLive'];
-            descriptor.range =  {
-                    startKey:startKey,
-                    endKey: endKey,
-                    comparator:comparator,
-                    timeToLive:timeToLive
+            descriptor.range = {
+                startKey:startKey,
+                endKey: endKey,
+                comparator:comparator,
+                timeToLive:timeToLive
             }
             $.terrastoreClient.queryByMapReduce(bucketName, descriptor, function(value) {
-                if(values == null){
-                    	context.trigger('onError',{message : corsMsg});
+                if (values == null) {
+                    context.trigger('onError', {message : corsMsg});
                     return;
                 }
                 $("#content").setTemplateElement("mapReduceResult");
@@ -454,6 +536,28 @@
             $("#content").setTemplateElement("exportImport");
             $("#content").processTemplate(null);
             $('#content input:submit').button();
+
+            $("#export").validate({
+                rules: {
+                    bucketName: "required",
+                    destination: "required"
+                },
+                messages: {
+                    bucketName: "Please enter the bucket name.",
+                    destination: "Please enter the export destination path."
+                }
+            });
+
+            $("#import").validate({
+                rules: {
+                    bucketName: "required",
+                    source: "required"
+                },
+                messages: {
+                    bucketName: "Please enter the bucket name.",
+                    source: "Please enter the import source path."
+                }
+            });
         });
 
         this.get('#/export', function(context) {
@@ -474,8 +578,8 @@
 
         this.get('#/stats', function(context) {
             $.terrastoreClient.getValue("_stats", "cluster", function(value) {
-                if(value == null) {
-                    	context.trigger('onError',{message : corsMsg});
+                if (value == null) {
+                    context.trigger('onError', {message : corsMsg});
                     return;
                 }
                 $("#content").setTemplateElement("stats");

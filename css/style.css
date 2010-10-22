@@ -210,6 +210,13 @@ form p label {
     width: 10em;
 }
 
+form p label.error {
+    float: center;
+    padding-left: 0.2em;
+    color:red;
+}
+
+
 #clusters .clusters-UNAVAILABLE {
     color: red;
 }
