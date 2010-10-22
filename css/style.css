@@ -145,14 +145,14 @@ h1 {
 }
 
 .content {
-    background: #ffffff;
+    background: url("images/ui-bg_highlight-hard_100_fafaf4_1x100.png") repeat-x scroll 50% 50% #FAFAF4;
     padding: 1em;
     border: solid #eeeeee 1px;
     margin-bottom: 0.5em;
 }
 
 .sidebarContent {
-    background: #ffffff;
+    background: url("images/ui-bg_highlight-hard_100_fafaf4_1x100.png") repeat-x scroll 50% 50% #FAFAF4;
     padding: 1em;
     border: solid #eeeeee 1px;
     margin-bottom: 0.5em;
