@@ -381,7 +381,7 @@
                 return false;
             });
             $('#rangeBox').hide();
-            
+
             $("#searchMapReduce").validate({
                 rules: {
                     bucketName: "required",
@@ -498,8 +498,9 @@
             var mapper = this.params['mapper'];
             var reducer = this.params['reducer'];
             var timeout = this.params['timeout'];
-            var combiner = this.params['combiner'];
-            var parameters = this.params['parameters'];
+
+            var combiner = this.params['combiner'] || null;
+            var parameters = this.params['parameters'] || null;
             var descriptor = {
                 task : {
                     mapper:  mapper,
@@ -512,14 +513,16 @@
             }
 
             var startKey = this.params['startKey'];
-            var endKey = this.params['endKey'];
-            var comparator = this.params['comparator'];
-            var timeToLive = this.params['timeToLive'];
-            descriptor.range = {
-                startKey:startKey,
-                endKey: endKey,
-                comparator:comparator,
-                timeToLive:timeToLive
+            if (startKey) {
+                var endKey = this.params['endKey'] || null;
+                var comparator = this.params['comparator'] || null;
+                var timeToLive = this.params['timeToLive'] || 0;
+                descriptor.range = {
+                    startKey:startKey,
+                    endKey: endKey,
+                    comparator:comparator,
+                    timeToLive:timeToLive
+                }
             }
             $.terrastoreClient.queryByMapReduce(bucketName, descriptor, function(value) {
                 if (values == null) {
