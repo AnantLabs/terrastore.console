@@ -79,6 +79,13 @@
             this.trigger('renderServers', context);
             this.trigger('renderServersSelect', context);
 
+            $("a[menuItem]").each(function(index, value) {
+                $(value).click(function() {
+                    context.trigger($(this).attr("menuItem"), context);
+                    return false;
+                });
+            });
+
         });
 
         this.bind('onSuccess', function() {
@@ -156,7 +163,11 @@
             });
         });
 
-        this.get('#/home', function(context) {
+        this.get('#/home',function(context){
+            context.trigger('home');        
+        });
+
+        this.bind('home', function() {
             $("#content").setTemplateElement("home");
             $("#content").processTemplate(null);
         });
@@ -216,7 +227,7 @@
 
         });
 
-        this.get('#/buckets', function(context) {
+        this.bind('buckets', function(e, context) {
             $.terrastoreClient.getBuckets(function(buckets) {
                 if (!$.isArray(buckets)) {
                     context.trigger('onError', {message : corsMsg});
@@ -347,7 +358,7 @@
             }});
         });
 
-        this.get('#/search/value', function() {
+        this.bind('search', function() {
             $("#content").setTemplateElement("searchValue");
             $("#content").processTemplate(null);
             $('#content input:submit').button();
@@ -383,7 +394,7 @@
                 $("#rangeClick span").toggleClass("ui-icon-circle-plus");
                 return false;
             }).click();
-            
+
             $("#searchMapReduce").validate({
                 rules: {
                     bucketName: "required",
@@ -541,7 +552,7 @@
 
         });
 
-        this.get('#/exportImport', function() {
+        this.bind('exportImport', function() {
             $("#content").setTemplateElement("exportImport");
             $("#content").processTemplate(null);
             $('#content input:submit').button();
@@ -585,7 +596,7 @@
             }});
         });
 
-        this.get('#/stats', function(context) {
+        this.bind('stats', function(e, context) {
             $.terrastoreClient.getValue("_stats", "cluster", function(value) {
                 if (value == null) {
                     context.trigger('onError', {message : corsMsg});
@@ -597,7 +608,7 @@
             });
         });
 
-        this.get('#/about', function() {
+        this.bind('about', function() {
             $("#content").setTemplateElement("about");
             $("#content").processTemplate(version);
         });
