@@ -291,7 +291,7 @@
                 }
                 var data = [];
                 for (var propertyName in values) {
-                    data.push({key:propertyName, value:JSON.stringify(values[propertyName])});
+                    data.push({key:propertyName, value:JSON.stringify(values[propertyName], null, 4)});
                 }
                 $("#content").setTemplateElement("values");
                 $("#content").setParam('path', "#/remove/");
@@ -436,7 +436,7 @@
                 $("#content").setTemplateElement("value");
                 $("#content").setParam('path', "#/remove/");
                 $("#content").setParam('bucketName', bucketName);
-                $("#content").processTemplate({"key":key, value:JSON.stringify(value)});
+                $("#content").processTemplate({"key":key, value:JSON.stringify(value, null, 4)});
                 $('#content td[class=value]').editable(function(value, settings) {
                     var bucketName = $("#bucketName").html();
                     var key = $("table td[class=key]").html();
@@ -486,7 +486,7 @@
                 }
                 var data = [];
                 for (var propertyName in values) {
-                    data.push({key:propertyName, value:JSON.stringify(values[propertyName])});
+                    data.push({key:propertyName, value:JSON.stringify(values[propertyName], null, 4)});
                 }
                 $("#content").setTemplateElement("values");
                 $("#content").setParam('path', "#/remove/");
@@ -547,7 +547,7 @@
                     return;
                 }
                 $("#content").setTemplateElement("mapReduceResult");
-                $("#content").processTemplate(JSON.stringify(value));
+                $("#content").processTemplate(JSON.stringify(value, null, 4));
             });
 
         });
