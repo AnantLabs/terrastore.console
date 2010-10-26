@@ -347,7 +347,7 @@
         this.get('#/remove/:bucketName', function(context) {
             var bucketName = this.params['bucketName'];
             $.terrastoreClient.removeBucket(bucketName, {successCallback: function() {
-                context.redirect('#/buckets');
+                context.trigger('buckets');
             }});
         });
 
