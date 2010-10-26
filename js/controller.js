@@ -83,7 +83,6 @@
                 $(value).click(function() {
                     context.trigger('event-context-before');
                     context.trigger($(this).attr("menuItem"), context);
-                    return false;
                 });
             });
 
