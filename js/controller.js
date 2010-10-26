@@ -387,6 +387,19 @@
                 }
             });
 
+            $("#searchPredicate").validate({
+                rules: {
+                    bucketName: "required",
+                    predicateType: "required",
+                    predicate:"required"
+                },
+                messages: {
+                    bucketName: "Please enter the bucket name.",
+                    predicateType: "Please enter the predicate type.",
+                    predicate: "Please enter the predicate."
+                }
+            });
+
             $("#rangeClick").click(function() {
                 $("#rangeBox input").attr('disabled', !$("#rangeBox input").attr('disabled'));
                 $("#rangeBox").toggleClass("disabled");
@@ -507,6 +520,41 @@
                     indicator : "<img src='images/loading.gif'>"
                 });
             });
+
+        });
+
+        this.post('#/search/predicate', function(context) {
+            var bucketName = this.params['bucketName'];
+            var predicateType = this.params['predicateType'];
+            var predicate = this.params['predicate'];
+            $.terrastoreClient.queryByPredicate(bucketName, predicate, function(values) {
+                if (values == null) {
+                    context.trigger('onError', {message : corsMsg});
+                    return;
+                }
+                var data = [];
+                for (var propertyName in values) {
+                    data.push({key:propertyName, value:JSON.stringify(values[propertyName], null, 4)});
+                }
+                $("#content").setTemplateElement("values");
+                $("#content").setParam('path', "#/remove/");
+                $("#content").setParam('bucketName', bucketName);
+                $("#content").processTemplate(data);
+                $('#content input:submit').button();
+                $('#content td[class=value]').editable(function(value, settings) {
+                    var bucketName = $("#bucketName").html();
+                    var key = $("table td[class=key]").html();
+                    $.terrastoreClient.putValue(bucketName, key, value);
+                    return (value);
+                }, {
+                    type      : 'textarea',
+                    cancel    : 'Cancel',
+                    submit    : 'Update',
+                    style     : 'display: inline',
+                    tooltip   : 'Click to edit...',
+                    indicator : "<img src='images/loading.gif'>"
+                });
+            }, {predicateType : predicateType});
 
         });
 
