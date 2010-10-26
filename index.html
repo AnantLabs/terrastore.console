@@ -47,11 +47,11 @@ Flash-Templates-Today.com - Gives a possibility to obtain a ready free flash tem
     <div id="navcontainer">
         <ul id="navlist">
             <li><a href="#/home" class="current" menuItem="home">Home</a></li>
-            <li><a href="#/buckets" class="current" menuItem="buckets">Buckets</a></li>
-            <li><a href="#/search/value" class="current" menuItem="search">Search</a></li>
-            <li><a href="#/exportImport" class="current" menuItem="exportImport">Export-Import</a></li>
-            <li><a href="#/stats" class="current" menuItem="stats">Statistics</a></li>
-            <li><a href="#/about" class="current" menuItem="about">About</a></li>
+            <li><a href="#/buckets" menuItem="buckets">Buckets</a></li>
+            <li><a href="#/search/value" menuItem="search">Search</a></li>
+            <li><a href="#/exportImport" menuItem="exportImport">Export-Import</a></li>
+            <li><a href="#/stats" menuItem="stats">Statistics</a></li>
+            <li><a href="#/about" menuItem="about">About</a></li>
             <li>
                 <div id="serversSelectContainer"><select id="serversSelect"></select></div>
             </li>
@@ -132,7 +132,7 @@ Flash-Templates-Today.com - Gives a possibility to obtain a ready free flash tem
     <form action="#/put/value" method="post" id="putBuckets">
         <p><label for="bucketName">Bucket:</label><input type="text" name="bucketName"/></p>
         <p><label for="key">Key:</label><input type="text" name="key"/></p>
-        <p><label for="value">Value:</label><textarea name="value" COLS=40 ROWS=6></textarea></p>
+        <p><label for="value">Value:</label><textarea name="value" cols="40" rows="6"/></p>
         <p><input type="submit" value="Put" /></p>
     </form>
 </div>
@@ -170,7 +170,7 @@ Flash-Templates-Today.com - Gives a possibility to obtain a ready free flash tem
     <form action="#/put/value" method="post" id="putBuckets">
         <input type="hidden" name="bucketName" value="{$P.bucketName}"/>
         <p><label for="key">Key:</label><input type="text" name="key"/></p>
-        <p><label for="value">Value:</label><textarea name="value" COLS=40 ROWS=6></textarea></p>
+        <p><label for="value">Value:</label><textarea name="value" cols="40" rows="6"/></p>
         <p><input type="submit" value="Put" /></p>
     </form>
 </div>
@@ -202,7 +202,7 @@ Flash-Templates-Today.com - Gives a possibility to obtain a ready free flash tem
         <form action="#/search/predicate" method="post" id="searchPredicate">
             <p><label for="bucket">Bucket:</label><input type="text" name="bucketName"/></p>
             <p><label for="predicateType">Predicate Type:</label><input type="text" name="predicateType"/></p>
-            <p><label for="predicate">Predicate:</label><textarea name="predicate" COLS=40 ROWS=6></textarea></p>
+            <p><label for="predicate">Predicate:</label><textarea name="value" cols="40" rows="6"/></p>
             <p><input type="submit" value="Search" /></p>
         </form>
     </div>
@@ -216,7 +216,7 @@ Flash-Templates-Today.com - Gives a possibility to obtain a ready free flash tem
             <p><label for="combiner">Combiner:</label><input type="text" name="combiner"/></p>
             <p><label for="reducer">Reducer:</label><input type="text" name="reducer"/></p>
             <p><label for="timeout">Timeout:</label><input type="text" name="timeout"/></p>
-            <p><label for="parameters">Parameters:</label><textarea name="parameters" COLS=40 ROWS=6></textarea></p>
+            <p><label for="parameters">Parameters:</label><textarea name="value" cols="40" rows="6"/></p>
             <div id="rangeClick"><span class="ui-icon ui-icon-circle-minus rangeIcon"></span><h3>Range</h3></div>
             <hr>
             <div id="rangeBox">
@@ -265,7 +265,7 @@ Flash-Templates-Today.com - Gives a possibility to obtain a ready free flash tem
         </tr>
         </thead>
         <tr>
-            <td class="value"><textarea name="value" COLS=40 ROWS=6>{$T}</textarea></td>
+            <td class="value"><textarea name="value" COLS="40" ROWS="6">{$T}</textarea></td>
         </tr>
     </table>
 </div>
