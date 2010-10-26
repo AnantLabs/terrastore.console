@@ -197,7 +197,15 @@ Flash-Templates-Today.com - Gives a possibility to obtain a ready free flash tem
             <p><input type="submit" value="Search" /></p>
         </form>
     </div>
-
+    <h1><a href="#">Search by predicate</a></h1>
+    <div>
+        <form action="#/search/predicate" method="post" id="searchPredicate">
+            <p><label for="bucket">Bucket:</label><input type="text" name="bucketName"/></p>
+            <p><label for="predicateType">Predicate Type:</label><input type="text" name="predicateType"/></p>
+            <p><label for="predicate">Predicate:</label><textarea name="predicate" COLS=40 ROWS=6></textarea></p>
+            <p><input type="submit" value="Search" /></p>
+        </form>
+    </div>
     <h1><a href="#">Search with Map Reduce</a></h1>
     <div>
         <form action="#/search/mapReduce" method="post" id="searchMapReduce">
