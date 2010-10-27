@@ -4,6 +4,8 @@
 (function($) {
     var app = $.sammy(function() {
         this.use(Sammy.Storage);
+        this.use(Sammy.Cache);
+        this.use(Sammy.NestedParams);
         var corsMsg = 'Please Check Your Network and that CORS is enabled on your Terrastore server. ' +
                 'Check the <a href="http://code.google.com/p/terrastore/wiki/Operations#Setup_Cross_Origin_Resource_Sharing_support" TARGET="_blank">guide</a>.';
         var version = '0.2';
@@ -163,8 +165,8 @@
             });
         });
 
-        this.get('#/home',function(context){
-            context.trigger('home');        
+        this.get('#/home', function(context) {
+            context.trigger('home');
         });
 
         this.bind('home', function() {
@@ -358,45 +360,51 @@
             }});
         });
 
-        this.bind('search', function() {
+        this.bind('search', function(e, context) {
             $("#content").setTemplateElement("searchValue");
+            $("#content").setParam('searchValueForm', new Sammy.FormBuilder('searchValue', context.cache('searchValue') || {}));
+            $("#content").setParam('searchRangeForm', new Sammy.FormBuilder('searchRange', context.cache('searchRange') || {}));
+            $("#content").setParam('searchPredicateForm', new Sammy.FormBuilder('searchPredicate', context.cache('searchPredicate') || {}));
+            $("#content").setParam('searchMapReduceForm', new Sammy.FormBuilder('searchMapReduce', context.cache('searchMapReduce') || {}));
+            $("#content").setParam('textareaParams', {cols:40,rows:6});
             $("#content").processTemplate(null);
+
             $('#content input:submit').button();
 
             $("#searchKey").validate({
                 rules: {
-                    bucketName: "required",
-                    key: "required"
+                    "searchValue[bucketName]": "required",
+                    "searchValue[key]": "required"
                 },
                 messages: {
-                    bucketName: "Please enter the bucket name.",
-                    key: "Please enter the bucket key."
+                    "searchValue[bucketName]": "Please enter the bucket name.",
+                    "searchValue[key]": "Please enter the bucket key."
                 }
             });
 
             $("#searchRange").validate({
                 rules: {
-                    bucketName: "required",
-                    from: "required",
-                    to:"required"
+                    "searchRange[bucketName]": "required",
+                    "searchRange[from]": "required",
+                    "searchRange[to]": "required"
                 },
                 messages: {
-                    bucketName: "Please enter the bucket name.",
-                    from: "Please enter the range start key.",
-                    to: "Please enter the range end key."
+                    "searchRange[bucketName]": "Please enter the bucket name.",
+                    "searchRange[from]": "Please enter the range start key.",
+                    "searchRange[to]": "Please enter the range end key."
                 }
             });
 
             $("#searchPredicate").validate({
                 rules: {
-                    bucketName: "required",
-                    predicateType: "required",
-                    predicate:"required"
+                    "searchPredicate[bucketName]": "required",
+                    "searchPredicate[predicateType]": "required",
+                    "searchPredicate[predicate]":"required"
                 },
                 messages: {
-                    bucketName: "Please enter the bucket name.",
-                    predicateType: "Please enter the predicate type.",
-                    predicate: "Please enter the predicate."
+                    "searchPredicate[bucketName]": "Please enter the bucket name.",
+                    "searchPredicate[predicateType]": "Please enter the predicate type.",
+                    "searchPredicate[predicate]": "Please enter the predicate."
                 }
             });
 
@@ -410,26 +418,26 @@
 
             $("#searchMapReduce").validate({
                 rules: {
-                    bucketName: "required",
-                    mapper: "required",
-                    reducer: "required",
-                    timeout: {
+                    "searchMapReduce[bucketName]": "required",
+                    "searchMapReduce[mapper]": "required",
+                    "searchMapReduce[reducer]": "required",
+                    "searchMapReduce[timeout]": {
                         required: true,
                         min: 1
                     },
-                    startKey: {
+                    "searchMapReduce[startKey]": {
                         required: "#rangeBox input:enabled"
                     }
                 },
                 messages: {
-                    bucketName: "Please enter the bucket name.",
-                    mapper: "Please enter your mapper.",
-                    reducer: "Please enter your reducer.",
-                    timeout:  {
+                    "searchMapReduce[bucketName]": "Please enter the bucket name.",
+                    "searchMapReduce[mapper]": "Please enter your mapper.",
+                    "searchMapReduce[reducer]": "Please enter your reducer.",
+                    "searchMapReduce[timeout]":  {
                         required: "Please enter the timeout.",
                         min: "Please enter a timeout greater than 0."
                     },
-                    startKey: "Please enter the range start key."
+                    "searchMapReduce[startKey]": "Please enter the range start key."
                 }
             });
             $("#searchMenu").accordion({
@@ -439,8 +447,9 @@
         });
 
         this.post('#/search/value', function(context) {
-            var key = this.params['key'];
-            var bucketName = this.params['bucketName'];
+            context.cache('searchValue', this.params.searchValue);
+            var key = this.params.searchValue.key;
+            var bucketName = this.params.searchValue.bucketName;
             $.terrastoreClient.getValue(bucketName, key, function(value) {
                 if (value == null) {
                     context.trigger('onError', {message : corsMsg});
@@ -488,10 +497,11 @@
         });
 
         this.post('#/search/range', function(context) {
-            var key = this.params['key'];
-            var bucketName = this.params['bucketName'];
-            var from = this.params['from'];
-            var to = this.params['to'];
+            context.cache('searchRange', this.params.searchRange);
+            var key = this.params.searchRange.key;
+            var bucketName = this.params.searchRange.bucketName;
+            var from = this.params.searchRange.from;
+            var to = this.params.searchRange.to;
             $.terrastoreClient.queryByRange(bucketName, from, to, function(values) {
                 if (values == null) {
                     context.trigger('onError', {message : corsMsg});
@@ -524,9 +534,10 @@
         });
 
         this.post('#/search/predicate', function(context) {
-            var bucketName = this.params['bucketName'];
-            var predicateType = this.params['predicateType'];
-            var predicate = this.params['predicate'];
+            context.cache('searchPredicate', this.params.searchPredicate);
+            var bucketName = this.params.searchPredicate.bucketName;
+            var predicateType = this.params.searchPredicate.predicateType;
+            var predicate = this.params.searchPredicate.predicate;
             $.terrastoreClient.queryByPredicate(bucketName, predicate, function(values) {
                 if (values == null) {
                     context.trigger('onError', {message : corsMsg});
@@ -559,13 +570,14 @@
         });
 
         this.post('#/search/mapReduce', function(context) {
-            var bucketName = this.params['bucketName'];
-            var mapper = this.params['mapper'];
-            var reducer = this.params['reducer'];
-            var timeout = this.params['timeout'];
+            context.cache('searchMapReduce', this.params.searchMapReduce);
+            var bucketName = this.params.searchMapReduce.bucketName;
+            var mapper = this.params.searchMapReduce.mapper;
+            var reducer = this.params.searchMapReduce.reducer;
+            var timeout = this.params.searchMapReduce.timeout;
 
-            var combiner = this.params['combiner'] || null;
-            var parameters = this.params['parameters'] || null;
+            var combiner = this.params.searchMapReduce.combiner || null;
+            var parameters = this.params.searchMapReduce.parameters || null;
             var descriptor = {
                 task : {
                     mapper:  mapper,
@@ -577,11 +589,11 @@
                 range:null
             }
 
-            var startKey = this.params['startKey'];
+            var startKey = this.params.searchMapReduce.startKey;
             if (startKey) {
-                var endKey = this.params['endKey'] || null;
-                var comparator = this.params['comparator'] || null;
-                var timeToLive = this.params['timeToLive'] || 0;
+                var endKey = this.params.searchMapReduce.endKey || null;
+                var comparator = this.params.searchMapReduce.comparator || null;
+                var timeToLive = this.params.searchMapReduce.timeToLive || 0;
                 descriptor.range = {
                     startKey:startKey,
                     endKey: endKey,
@@ -590,12 +602,13 @@
                 }
             }
             $.terrastoreClient.queryByMapReduce(bucketName, descriptor, function(value) {
-                if (values == null) {
+                if (value == null) {
                     context.trigger('onError', {message : corsMsg});
                     return;
                 }
                 $("#content").setTemplateElement("mapReduceResult");
-                $("#content").processTemplate(JSON.stringify(value, null, 4));
+                $("#content").setParam('textareaParams', {cols:40,rows:6});
+                $("#content").processTemplate(new Sammy.FormBuilder('result', { result :JSON.stringify(value, null, 4)}));
             });
 
         });
