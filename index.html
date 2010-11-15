@@ -194,8 +194,13 @@ Flash-Templates-Today.com - Gives a possibility to obtain a ready free flash tem
     <div>
         <form action="#/search/range" method="post" id="searchRange">
             <p><label for="searchRange[bucketName]">Bucket:</label>{$P.searchRangeForm.text('bucketName')}</p>
-            <p><label for="searchRange[from]">From:</label>{$P.searchRangeForm.text('from')}</p>
-            <p><label for="searchRange[to]">To:</label>{$P.searchRangeForm.text('to')}</p>
+            <p><label for="searchRange[startKey]">StartKey:</label>{$P.searchRangeForm.text('startKey')}</p>
+            <p><label for="searchRange[endKey]">EndKey:</label>{$P.searchRangeForm.text('endKey')}</p>
+            <p><label for="searchRange[limit]">Limit (Default:100):</label>{$P.searchRangeForm.text('limit')}</p>
+            <p><label for="searchRange[comparator]">Comparator (Default:Lexical-asc):</label>{$P.searchRangeForm.text('comparator')}</p>
+            <p><label for="searchRange[predicateType]">Predicate Type:</label>{$P.searchRangeForm.text('predicateType')}</p>
+            <p><label for="searchRange[predicate]">Predicate:</label>{$P.searchRangeForm.text('predicate')}</p>
+            <p><label for="searchRange[timeToLive]">TimeToLive (Default:10000 millisec):</label>{$P.searchRangeForm.text('timeToLive')}</p>
             <p><input type="submit" value="Search" /></p>
         </form>
     </div>

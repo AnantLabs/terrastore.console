@@ -210,11 +210,11 @@
          * and the query executed on the fresh snasphot.
          * @return A map containing key/value pairs
          */
-        queryByRange:function(bucket, startKey, endKey, successCallback, predicateExpression, options) {
+        queryByRange:function(bucket, startKey, endKey, successCallback, options) {
             $.terrastoreClient.checkNotNull(bucket, startKey, endKey);
             var currentOptions = $.extend(true, {}, $.terrastoreClient.options, {successCallback:successCallback}, options);
-            var currentURL = currentOptions.baseURL + "/" + bucket + "/range?comparator=" + currentOptions.comparator + "&startKey=" + startKey + "&endKey=" + endKey + "&timeToLive=" + currentOptions.timeToLive;
-            if (predicateExpression) currentURL = currentURL + "&predicate=" + currentOptions.predicateType + ":" + encodeURIComponent(predicateExpression);
+            var currentURL = currentOptions.baseURL + "/" + bucket + "/range?comparator=" + currentOptions.comparator + "&startKey=" + startKey + "&endKey=" + endKey + "&timeToLive=" + currentOptions.timeToLive + "&limit=" + currentOptions.limit;
+            if (options.predicateExpression) currentURL = currentURL + "&predicate=" + currentOptions.predicateType + ":" + encodeURIComponent(options.predicateExpression);
             $.ajax({
                 url: currentURL,
                 dataType:"json",

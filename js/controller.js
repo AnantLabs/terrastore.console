@@ -385,13 +385,13 @@
             $("#searchRange").validate({
                 rules: {
                     "searchRange[bucketName]": "required",
-                    "searchRange[from]": "required",
-                    "searchRange[to]": "required"
+                    "searchRange[startKey]": "required",
+                    "searchRange[endKey]": "required"
                 },
                 messages: {
                     "searchRange[bucketName]": "Please enter the bucket name.",
-                    "searchRange[from]": "Please enter the range start key.",
-                    "searchRange[to]": "Please enter the range end key."
+                    "searchRange[startKey]": "Please enter the range start key.",
+                    "searchRange[endKey]": "Please enter the range end key."
                 }
             });
 
@@ -498,11 +498,27 @@
 
         this.post('#/search/range', function(context) {
             context.cache('searchRange', this.params.searchRange);
-            var key = this.params.searchRange.key;
             var bucketName = this.params.searchRange.bucketName;
-            var from = this.params.searchRange.from;
-            var to = this.params.searchRange.to;
-            $.terrastoreClient.queryByRange(bucketName, from, to, function(values) {
+            var startKey = this.params.searchRange.startKey;
+            var endKey = this.params.searchRange.endKey;
+            var predicate = this.params.searchRange.predicate;
+            var options = {};
+            if(this.params.searchRange.comparator) {
+                options.comparator = this.params.searchRange.comparator;
+            }
+            if(this.params.searchRange.timeToLive) {
+                options.timeToLive = this.params.searchRange.timeToLive;
+            }
+            if(this.params.searchRange.predicateExpression) {
+                options.predicateExpression = this.params.searchRange.predicateExpression;
+            }
+            if(this.params.searchRange.predicateType) {
+                options.predicateType = this.params.searchRange.predicateType;
+            }
+            if(this.params.searchRange.limit) {
+                options.limit = this.params.searchRange.limit;
+            }
+            $.terrastoreClient.queryByRange(bucketName, startKey, endKey, function(values) {
                 if (values == null) {
                     context.trigger('onError', {message : corsMsg});
                     return;
@@ -529,7 +545,7 @@
                     tooltip   : 'Click to edit...',
                     indicator : "<img src='images/loading.gif'>"
                 });
-            });
+            }, options);
 
         });
 
