@@ -207,7 +207,7 @@ form p label {
     text-align: right;
     float: left;
     padding: 0.2em;
-    width: 10em;
+    width: 20em;
 }
 
 form p label.error {
