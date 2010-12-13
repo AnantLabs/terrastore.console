@@ -8,7 +8,7 @@
         this.use(Sammy.NestedParams);
         var corsMsg = 'Please Check Your Network and that CORS is enabled on your Terrastore server. ' +
                 'Check the <a href="http://code.google.com/p/terrastore/wiki/Operations#Setup_Cross_Origin_Resource_Sharing_support" TARGET="_blank">guide</a>.';
-        var version = '0.2';
+        var version = '0.3';
 
         this.bind('run', function() {
             var context = this;
