@@ -123,8 +123,7 @@ Flash-Templates-Today.com - Gives a possibility to obtain a ready free flash tem
         {#foreach $T as row}
         <tr>
             <td class="bucket">{$T.row}</td>
-            <td class="operation"><a class="viewOp" href="{$P.viewPath + $T.row}">View</a>,
-                                  <a class="removeOp" href="{$P.removePath + $T.row}">Delete</a></td>
+            <td class="operation"><a class="removeOp" href="{$P.removePath + $T.row}">Delete</a></td>
         </tr>
         {#/for}
     </table>
@@ -253,12 +252,27 @@ Flash-Templates-Today.com - Gives a possibility to obtain a ready free flash tem
         <tr>
             <td class="key">{$T.key}</td>
             <td class="value">{$T.value}</td>
-            <td class="operation"><a class="removeOp" href="{$P.path + $P.bucketName + '/' + $T.key}">Delete</a></td>
+            <td class="operation"><a class="removeOp" href="{$P.removePath + $P.bucketName + '/' + $T.key}">Delete</a>, 
+                                  <a class="mergeOp" href="{$P.mergePath + $P.bucketName + '/' + $T.key}">Merge</a></td>
         </tr>
     </table>
 </div>
 <div id="remove-confirm" title="Do you want to remove it?" style="display:none">
     <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>These item will be permanently deleted and cannot be recovered. Are you sure?</p>
+</div>
+    --></textarea>
+</p>
+
+<p style="display:none"><textarea id="merge" rows="0" cols="0"><!--
+<div class="content ui-corner-all">
+    <h1>Merge value</h1>
+    <form action="#/merge/value" method="post" id="mergeValue">
+        <p><label for="bucketName">Bucket:</label><input type="text" name="bucketName" value="{$P.bucketName}" readonly/></p>
+        <p><label for="key">Key:</label><input type="text" name="key" value="{$P.key}" readonly/></p>
+        <p><label for="value">Value:</label>{$P.mergeValueForm.textarea('value', $P.textareaParams)}</p>
+        <p><label for="merge">Merge:</label><textarea name="merge" cols="40" rows="6"/></p>
+        <p><input type="submit" value="Merge" /></p>
+    </form>
 </div>
     --></textarea>
 </p>
