@@ -360,6 +360,38 @@
             }});
         });
 
+        this.post('#/remove/range', function(context) {
+            context.cache('removeRange', this.params.removeRange);
+            var bucketName = this.params.removeRange.bucketName;
+            var startKey = this.params.removeRange.startKey;
+            var endKey = this.params.removeRange.endKey;
+            var predicate = this.params.removeRange.predicate;
+            var options = {};
+            if(this.params.removeRange.comparator) {
+                options.comparator = this.params.removeRange.comparator;
+            }
+            if(this.params.removeRange.timeToLive) {
+                options.timeToLive = this.params.removeRange.timeToLive;
+            }
+            if(this.params.removeRange.predicateExpression) {
+                options.predicateExpression = this.params.removeRange.predicateExpression;
+            }
+            if(this.params.removeRange.predicateType) {
+                options.predicateType = this.params.removeRange.predicateType;
+            }
+            if(this.params.removeRange.limit) {
+                options.limit = this.params.removeRange.limit;
+            }
+            $.terrastoreClient.removeByRange(bucketName, startKey, endKey, function(values) {
+                if (values == null) {
+                    context.trigger('onError', {message : corsMsg});
+                    return;
+                }
+                context.trigger('onSuccess', context);
+            }, options);
+
+        });
+
         this.get('#/merge/:bucketName/:key', function(context) {
             var bucketName = this.params['bucketName'];
             var key = this.params['key'];
@@ -383,7 +415,7 @@
 
         this.post('#/merge/value', function(context) {
             $.terrastoreClient.mergeValue(this.params['bucketName'], this.params['key'], this.params['merge'], {successCallback: function() {
-                context.trigger('onSuccess');
+                context.trigger('onSuccess', context);
             }});
         });
 
@@ -657,10 +689,11 @@
 
         });
 
-        this.bind('exportImport', function() {
-            $("#content").setTemplateElement("exportImport");
+        this.bind('otherOperations', function(eventName, context) {
+            $("#content").setTemplateElement("otherOperations");
+            $("#content").setParam('removeRangeForm', new Sammy.FormBuilder('removeRange', context.cache('removeRange') || {}));
             $("#content").processTemplate(null);
-            $('#content input:submit').button();
+            $('#content input:submit,#content input:button').button();
 
             $("#export").validate({
                 rules: {
@@ -682,6 +715,48 @@
                     bucketName: "Please enter the bucket name.",
                     source: "Please enter the import source path."
                 }
+            });
+
+            $('#removeRange input:button').click(function() {
+                if($("#removeRange").valid()){
+                    $("#remove-confirm").dialog({
+                        resizable: false,
+                        width:'auto',
+                        modal: true,
+                        //autoOpen: false,
+                        buttons: {
+                            'Delete this items': function() {
+                                $(this).dialog('close');
+                                $(this).dialog('destroy');
+                                $("#removeRange").submit();
+                            },
+                            Cancel: function() {
+                                $(this).dialog('close');
+                                $(this).dialog('destroy');
+                            }
+                        }
+                    });
+                }
+                return false;
+            });
+
+            $("#removeRange").validate({
+                onsubmit: false,
+                rules: {
+                    "removeRange[bucketName]": "required",
+                    "removeRange[startKey]": "required",
+                    "removeRange[endKey]": "required"
+                },
+                messages: {
+                    "removeRange[bucketName]": "Please enter the bucket name.",
+                    "removeRange[startKey]": "Please enter the range start key.",
+                    "removeRange[endKey]": "Please enter the range end key."
+                }
+            });
+
+            $("#otherOperationsMenu").accordion({
+                autoHeight: false,
+                navigation: true
             });
         });
 

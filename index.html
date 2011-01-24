@@ -51,7 +51,7 @@ Flash-Templates-Today.com - Gives a possibility to obtain a ready free flash tem
             <li><a href="#/home" class="current" menuItem="home">Home</a></li>
             <li><a href="#/buckets" menuItem="buckets">Buckets</a></li>
             <li><a href="#/search/value" menuItem="search">Search</a></li>
-            <li><a href="#/exportImport" menuItem="exportImport">Export-Import</a></li>
+            <li><a href="#/otherOperations" menuItem="otherOperations">Operations</a></li>
             <li><a href="#/stats" menuItem="stats">Statistics</a></li>
             <li><a href="#/about" menuItem="about">About</a></li>
             <li>
@@ -293,22 +293,41 @@ Flash-Templates-Today.com - Gives a possibility to obtain a ready free flash tem
     --></textarea>
 </p>
 
-<p style="display:none"><textarea id="exportImport" rows="0" cols="0"><!--
-<div class="content ui-corner-all">
-    <h1>Export</h1>
-    <form action="#/export" method="get" id="export">
-        <p><label for="bucketName">Bucket:</label><input type="text" name="bucketName"/></p>
-        <p><label for="destination">Destination:</label><input type="text" name="destination"/></p>
-        <p><input type="submit" value="Export" /></p>
-    </form>
+<p style="display:none"><textarea id="otherOperations" rows="0" cols="0"><!--
+<div id="otherOperationsMenu">
+    <h1><a href="#">Remove by range</a></h1>
+    <div>
+        <form action="#/remove/range" method="post" id="removeRange">
+            <p><label for="removeRange[bucketName]">Bucket:</label>{$P.removeRangeForm.text('bucketName')}</p>
+            <p><label for="removeRange[startKey]">StartKey:</label>{$P.removeRangeForm.text('startKey')}</p>
+            <p><label for="removeRange[endKey]">EndKey:</label>{$P.removeRangeForm.text('endKey')}</p>
+            <p><label for="removeRange[limit]">Limit (Default:100):</label>{$P.removeRangeForm.text('limit')}</p>
+            <p><label for="removeRange[comparator]">Comparator (Default:Lexical-asc):</label>{$P.removeRangeForm.text('comparator')}</p>
+            <p><label for="removeRange[predicateType]">Predicate Type:</label>{$P.removeRangeForm.text('predicateType')}</p>
+            <p><label for="removeRange[predicate]">Predicate:</label>{$P.removeRangeForm.text('predicate')}</p>
+            <p><label for="removeRange[timeToLive]">TimeToLive (Default:10000 millisec):</label>{$P.removeRangeForm.text('timeToLive')}</p>
+            <p><input type="button" value="Remove" /></p>
+        </form>
+    </div>
+    <h1><a href="#">Export</a></h1>
+    <div>
+        <form action="#/export" method="get" id="export">
+            <p><label for="bucketName">Bucket:</label><input type="text" name="bucketName"/></p>
+            <p><label for="destination">Destination:</label><input type="text" name="destination"/></p>
+            <p><input type="submit" value="Export" /></p>
+        </form>
+    </div>
+    <h1><a href="#">Import</a></h1>
+    <div>
+        <form action="#/import" method="get" id="import">
+            <p><label for="bucketName">Bucket:</label><input type="text" name="bucketName"/></p>
+            <p><label for="source">Source:</label><input type="text" name="source"/></p>
+            <p><input type="submit" value="Import" /></p>
+        </form>
+    </div>
 </div>
-<div class="content ui-corner-all">
-    <h1>Import</h1>
-    <form action="#/import" method="get" id="import">
-        <p><label for="bucketName">Bucket:</label><input type="text" name="bucketName"/></p>
-        <p><label for="source">Source:</label><input type="text" name="source"/></p>
-        <p><input type="submit" value="Import" /></p>
-    </form>
+<div id="remove-confirm" title="Do you want to remove them?" style="display:none">
+    <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>These items will be permanently deleted and cannot be recovered. Are you sure?</p>
 </div>
     --></textarea>
 </p>
