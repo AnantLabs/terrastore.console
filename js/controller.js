@@ -360,6 +360,33 @@
             }});
         });
 
+        this.get('#/merge/:bucketName/:key', function(context) {
+            var bucketName = this.params['bucketName'];
+            var key = this.params['key'];
+            $.terrastoreClient.getValue(bucketName, key, function(value) {
+                if (value == null) {
+                    context.trigger('onError', {message : corsMsg});
+                    return;
+                }
+
+                $("#content").setTemplateElement("merge");
+                $("#content").setParam('mergeValueForm', new Sammy.FormBuilder('mergeValue', {
+                    value : JSON.stringify(value, null, 4)
+                }));
+                $("#content").setParam('textareaParams', {cols:40,rows:6, readOnly:true});
+                $("#content").setParam('bucketName', bucketName);
+                $("#content").setParam('key', key);
+                $("#content").processTemplate(null);
+                $('#content input:submit').button();
+            });
+        });
+
+        this.post('#/merge/value', function(context) {
+            $.terrastoreClient.mergeValue(this.params['bucketName'], this.params['key'], this.params['merge'], {successCallback: function() {
+                context.trigger('onSuccess');
+            }});
+        });
+
         this.bind('search', function(e, context) {
             $("#content").setTemplateElement("searchValue");
             $("#content").setParam('searchValueForm', new Sammy.FormBuilder('searchValue', context.cache('searchValue') || {}));
@@ -456,7 +483,8 @@
                     return;
                 }
                 $("#content").setTemplateElement("value");
-                $("#content").setParam('path', "#/remove/");
+                $("#content").setParam('removePath', "#/remove/");
+                $("#content").setParam('mergePath', "#/merge/");
                 $("#content").setParam('bucketName', bucketName);
                 $("#content").processTemplate({"key":key, value:JSON.stringify(value, null, 4)});
                 $('#content td[class=value]').editable(function(value, settings) {

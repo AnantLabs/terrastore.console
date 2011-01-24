@@ -69,6 +69,34 @@
             });
         },
 
+        /** Merge the value stored under the given bucket and key with the new passed value.
+         *
+         * @param bucket The name of the bucket holding the value to merge.
+         * @param key The key of the value to merge.
+         * @param merge The value representing the merge.
+         */
+        mergeValue: function(bucket, key, merge, options) {
+            $.terrastoreClient.checkNotNull(bucket, key, merge);
+            var currentOptions = $.extend(true, {}, $.terrastoreClient.options, options);
+            if (typeof merge == "object") {
+                merge = JSON.stringify(merge);
+            } else if (typeof merge !== "string") {
+                $.error("The type of 'value' must be a json string or object");
+            } else if (currentOptions.checkJSON) {
+                eval('(' + merge + ')');
+            }
+            var currentURL = currentOptions.baseURL + "/" + bucket + "/" + key + "/merge";
+            $.ajax({
+                data: merge,
+                url: currentURL,
+                contentType:"application/json",
+                type: 'POST',
+                processData: false,
+                success: currentOptions.successCallback,
+                error: currentOptions.errorCallback
+            });
+        },
+
         /**
          * Get the value from the given bucket under the given key.<br>
          * If a non-empty predicate is provided, the returned value must satisfy the given predicate as well.
@@ -104,6 +132,45 @@
             var currentOptions = $.extend(true, {}, $.terrastoreClient.options, options);
             $.ajax({
                 url: currentOptions.baseURL + "/" + bucket + "/" + key,
+                type: 'DELETE',
+                success: currentOptions.successCallback,
+                error: currentOptions.errorCallback
+            });
+        },
+
+        /**
+         * Remove all key/value pairs whose key falls wihtin the given range, and whose value satisfies the given predicate (if any).
+         * <br><br>
+         * the selected range goes from start key to end key, with the max number of elements equal to the provided limit.<br>
+         * The limit specifies the max number of key/value pairs to examine and possibly delete. If the limit is lower than the number of
+         * keys in the range and a predicate is used, the number of actually removed key/value pairs may be lower than the limit, while
+         * values matching the predicate may still remain in the bucket.
+         * If the limit is set to zero, all key/value pairs in the range will be examined.
+         * <br><br>
+         * If no end key is provided, all elements starting from the start key and up to the limit will be removed.
+         * <br><br>
+         * The range query is executed over a snapshot view of the bucket keys, so the timeToLive parameter determines,
+         * in milliseconds, the snapshot max age: if the snapshot is older than the given time, it's recomputed,
+         * otherwise it will be actually used for the query.
+         *
+         * @param bucket The bucket to query.
+         * @param startKey First key in range.
+         * @param endKey Last key in range (inclusive); if null, all elements starting from start key and up to the limit will be removed.
+         * @param limit Max number of keys to examine/elements to remove (even if not reaching the end of the range); if zero, all elements in range will be deleted.
+         * @param comparator Name of the comparator to use for testing if a key is in range.
+         * @param predicate The predicate to evaluate against values (optional).
+         * @param timeToLive Number of milliseconds specifying the snapshot age; if set to 0, a new snapshot will be immediately computed
+         * for the delete operation to be executed on.
+         * @return An unordered {@link Keys} set containing the keys that were actually removed.
+         */
+        removeByRange:function(bucket, startKey, endKey, successCallback, options) {
+            $.terrastoreClient.checkNotNull(bucket, startKey, endKey);
+            var currentOptions = $.extend(true, {}, $.terrastoreClient.options, {successCallback:successCallback}, options);
+            var currentURL = currentOptions.baseURL + "/" + bucket + "/remove?comparator=" + currentOptions.comparator + "&startKey=" + startKey + "&endKey=" + endKey + "&timeToLive=" + currentOptions.timeToLive + "&limit=" + currentOptions.limit;
+            if (options.predicateExpression) currentURL = currentURL + "&predicate=" + currentOptions.predicateType + ":" + encodeURIComponent(options.predicateExpression);
+            $.ajax({
+                url: currentURL,
+                dataType:"json",
                 type: 'DELETE',
                 success: currentOptions.successCallback,
                 error: currentOptions.errorCallback
@@ -242,7 +309,7 @@
                 error: currentOptions.errorCallback
             });
         },
-        
+
         /**
          * Execute a map-reduce query over the given bucket.
          *
