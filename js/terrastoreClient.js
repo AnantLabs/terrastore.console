@@ -166,7 +166,7 @@
         removeByRange:function(bucket, startKey, endKey, successCallback, options) {
             $.terrastoreClient.checkNotNull(bucket, startKey, endKey);
             var currentOptions = $.extend(true, {}, $.terrastoreClient.options, {successCallback:successCallback}, options);
-            var currentURL = currentOptions.baseURL + "/" + bucket + "/remove?comparator=" + currentOptions.comparator + "&startKey=" + startKey + "&endKey=" + endKey + "&timeToLive=" + currentOptions.timeToLive + "&limit=" + currentOptions.limit;
+            var currentURL = currentOptions.baseURL + "/" + bucket + "/range?comparator=" + currentOptions.comparator + "&startKey=" + startKey + "&endKey=" + endKey + "&timeToLive=" + currentOptions.timeToLive + "&limit=" + currentOptions.limit;
             if (options.predicateExpression) currentURL = currentURL + "&predicate=" + currentOptions.predicateType + ":" + encodeURIComponent(options.predicateExpression);
             $.ajax({
                 url: currentURL,
